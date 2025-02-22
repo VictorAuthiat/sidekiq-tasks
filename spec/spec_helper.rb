@@ -11,6 +11,8 @@ require "sidekiq/web"
 require "sidekiq/tasks"
 require "sidekiq/tasks/web"
 
+require "simplecov"
+
 Dir[File.expand_path("support/**/*.rb", __dir__)].sort.each { |file| require file }
 
 RSpec.configure do |config|

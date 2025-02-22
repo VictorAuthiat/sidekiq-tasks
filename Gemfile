@@ -11,5 +11,7 @@ gem "sidekiq", "~> 6.5"
 gem "rack-session", "~> 1.0"
 gem "rack-test", "~> 1.1"
 gem "rspec", "~> 3.0"
+gem "simplecov", require: false
+gem "simplecov-json", require: false
 gem "webdrivers", "~> 5.3.1"
 gem "webrick", "~> 1.9.1"

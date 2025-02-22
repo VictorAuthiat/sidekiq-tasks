@@ -15,6 +15,10 @@
       <td><%= task.desc %></td>
     </tr>
     <tr>
+      <th><%= t("strategy") %></th>
+      <td><%= task.strategy.name %></td>
+    </tr>
+    <tr>
       <th><%= t("last_enqueued") %></th>
       <td><%= task_last_enqueue_at(task) %></td>
     </tr>

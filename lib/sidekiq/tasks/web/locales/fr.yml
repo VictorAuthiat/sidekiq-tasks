@@ -13,5 +13,6 @@ fr:
   enqueued: "Mise en file d'attente"
   task: "Tâche"
   desc: "Description"
+  strategy: "Stratégie"
   run_task: "Exécuter la tâche"
   enqueue: "Mettre en file d'attente"

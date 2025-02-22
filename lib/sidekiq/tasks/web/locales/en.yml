@@ -13,5 +13,6 @@ en:
   enqueued: "Enqueued"
   task: "Task"
   desc: "Description"
+  strategy: "Strategy"
   run_task: "Run"
   enqueue: "Enqueue"

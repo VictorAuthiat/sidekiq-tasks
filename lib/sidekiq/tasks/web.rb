@@ -6,6 +6,7 @@ module Sidekiq
   module Tasks
     module Web
       autoload :Extension, "sidekiq/tasks/web/extension"
+      autoload :Params, "sidekiq/tasks/web/params"
     end
   end
 end

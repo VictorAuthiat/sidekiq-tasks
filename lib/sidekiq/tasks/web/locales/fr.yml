@@ -4,3 +4,5 @@ fr:
   name: "Nom"
   task: "Tâche"
   desc: "Description"
+  run_task: "Exécuter la tâche"
+  enqueue: "Mettre en file d'attente"

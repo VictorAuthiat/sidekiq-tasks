@@ -19,9 +19,22 @@ module Sidekiq
           end
 
           app.get "/tasks/:name" do
-            @task = Sidekiq::Tasks.tasks.find_by!(name: unparameterize_task_name(params["name"]))
+            @task = find_task!(params["name"])
 
             erb(read_view(:_task), locals: {task: @task})
+          rescue Sidekiq::Tasks::NotFoundError
+            throw :halt, [404, {Rack::CONTENT_TYPE => "text/plain"}, ["Task not found"]]
+          end
+
+          app.post "/tasks/:name/enqueue" do
+            task = find_task!(params["name"])
+            args = Sidekiq::Tasks::Web::Params.new(task, params["args"]).permit!
+
+            task.enqueue(args)
+
+            redirect(task_url(root_path, task))
+          rescue Sidekiq::Tasks::ArgumentError => e
+            throw :halt, [400, {Rack::CONTENT_TYPE => "text/plain"}, [e.message]]
           rescue Sidekiq::Tasks::NotFoundError
             throw :halt, [404, {Rack::CONTENT_TYPE => "text/plain"}, ["Task not found"]]
           end

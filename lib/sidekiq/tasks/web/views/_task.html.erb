@@ -16,3 +16,30 @@
     </tr>
   </tbody>
 </table>
+
+<header class="row">
+  <div class="col-sm-12">
+    <h2><%= t("run_task") %></h2>
+  </div>
+</header>
+
+<form action="<%= task_url(root_path, task) %>/enqueue" method="post">
+  <%= csrf_tag %>
+
+  <div class="container">
+    <div class="row">
+      <% task.args.each do |arg| %>
+        <div class="col-md-6 mb-3">
+          <div class="form-group">
+            <label for="<%= arg %>" class="form-label"><%= arg %></label>
+            <input type="text" class="form-control" name="args[<%= arg %>]" id="<%= arg %>" />
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary">
+    <%= t("enqueue") %>
+  </button>
+</form>

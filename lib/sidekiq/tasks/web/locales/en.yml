@@ -4,3 +4,5 @@ en:
   name: "Name"
   task: "Task"
   desc: "Description"
+  run_task: "Run task"
+  enqueue: "Enqueue"

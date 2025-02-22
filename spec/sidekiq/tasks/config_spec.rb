@@ -26,8 +26,17 @@ RSpec.describe Sidekiq::Tasks::Config do
     let(:config) { described_class.new }
 
     it "sets the sidekiq options" do
-      config.sidekiq_options = {queue: "foo", retry: true}
-      expect(config.sidekiq_options).to eq({queue: "foo", retry: true})
+      sidekiq_options = {
+        queue: "foo",
+        retry: true,
+        dead: true,
+        backtrace: true,
+        pool: "default",
+        tags: ["foo"],
+      }
+
+      config.sidekiq_options = sidekiq_options
+      expect(config.sidekiq_options).to eq(sidekiq_options)
     end
 
     it "raises an error when the sidekiq options are not a Hash" do
@@ -69,6 +78,66 @@ RSpec.describe Sidekiq::Tasks::Config do
           "'retry' must be an instance of TrueClass or FalseClass but received Integer"
         )
       )
+    end
+
+    it "raises an error when the dead key is invalid" do
+      expect { config.sidekiq_options = {queue: "foo", retry: false, dead: "foo"} }.to(
+        raise_error(
+          Sidekiq::Tasks::ArgumentError,
+          "'dead' must be an instance of NilClass or TrueClass or FalseClass but received String"
+        )
+      )
+    end
+
+    it "does not raise an error when the dead key is nil", :aggregate_failures do
+      expect { config.sidekiq_options = {queue: "foo", retry: false, dead: nil} }.not_to raise_error
+      expect { config.sidekiq_options = {queue: "foo", retry: false, dead: false} }.not_to raise_error
+      expect { config.sidekiq_options = {queue: "foo", retry: false, dead: true} }.not_to raise_error
+    end
+
+    it "raises an error when the backtrace key is invalid" do
+      expect { config.sidekiq_options = {queue: "foo", retry: false, backtrace: "foo"} }.to(
+        raise_error(
+          Sidekiq::Tasks::ArgumentError,
+          "'backtrace' must be an instance of NilClass or TrueClass or FalseClass or Integer but received String"
+        )
+      )
+    end
+
+    it "does not raise an error when the backtrace key is nil", :aggregate_failures do
+      expect { config.sidekiq_options = {queue: "foo", retry: false, backtrace: nil} }.not_to raise_error
+      expect { config.sidekiq_options = {queue: "foo", retry: false, backtrace: false} }.not_to raise_error
+      expect { config.sidekiq_options = {queue: "foo", retry: false, backtrace: true} }.not_to raise_error
+      expect { config.sidekiq_options = {queue: "foo", retry: false, backtrace: 0} }.not_to raise_error
+    end
+
+    it "raises an error when the pool key is invalid" do
+      expect { config.sidekiq_options = {queue: "foo", retry: false, pool: 1} }.to(
+        raise_error(
+          Sidekiq::Tasks::ArgumentError,
+          "'pool' must be an instance of NilClass or String but received Integer"
+        )
+      )
+    end
+
+    it "does not raise an error when the pool key is nil", :aggregate_failures do
+      expect { config.sidekiq_options = {queue: "foo", retry: false, pool: nil} }.not_to raise_error
+      expect { config.sidekiq_options = {queue: "foo", retry: false, pool: "default"} }.not_to raise_error
+    end
+
+    it "raises an error when the tags key is invalid" do
+      expect { config.sidekiq_options = {queue: "foo", retry: false, tags: 1} }.to(
+        raise_error(
+          Sidekiq::Tasks::ArgumentError,
+          "'tags' must be an instance of NilClass or Array but received Integer"
+        )
+      )
+    end
+
+    it "does not raise an error when the tags key is nil", :aggregate_failures do
+      expect { config.sidekiq_options = {queue: "foo", retry: false, tags: nil} }.not_to raise_error
+      expect { config.sidekiq_options = {queue: "foo", retry: false, tags: []} }.not_to raise_error
+      expect { config.sidekiq_options = {queue: "foo", retry: false, tags: ["foo"]} }.not_to raise_error
     end
   end
 

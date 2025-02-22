@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "capybara/rspec"
+require "webdrivers"
+
 require "rack/test"
 require "rack/session"
 

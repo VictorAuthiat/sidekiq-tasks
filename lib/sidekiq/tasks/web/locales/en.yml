@@ -14,5 +14,5 @@ en:
   task: "Task"
   desc: "Description"
   strategy: "Strategy"
-  run_task: "Run"
+  run_task: "Run task"
   enqueue: "Enqueue"

@@ -23,11 +23,17 @@ module Sidekiq
       end
 
       def enqueue(params = {})
-        strategy.enqueue_task(name, params)
+        jid = strategy.enqueue_task(name, params)
+
+        storage.store(jid, params)
       end
 
       def execute(params = {})
         strategy.execute_task(name, params)
+      end
+
+      def storage
+        @_storage ||= Sidekiq::Tasks::Storage.new(name)
       end
     end
   end

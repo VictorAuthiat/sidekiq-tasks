@@ -14,8 +14,41 @@
       <th><%= t("desc") %></th>
       <td><%= task.desc %></td>
     </tr>
+    <tr>
+      <th><%= t("last_enqueued") %></th>
+      <td><%= task_last_enqueue_at(task) %></td>
+    </tr>
   </tbody>
 </table>
+
+<header class="row">
+  <div class="col-sm-12">
+    <h2><%= t("history") %></h2>
+  </div>
+</header>
+
+<% if task.history.empty? %>
+  <p><%= t("no_history") %></p>
+<% else %>
+  <table class="table table-hover table-bordered table-striped">
+    <thead>
+    <tr>
+      <th><%= t("jid") %></th>
+      <th><%= t("args") %></th>
+      <th><%= t("enqueued") %></th>
+    </tr>
+    </thead>
+    <tbody>
+      <% task.history.each do |jid_history| %>
+        <tr>
+          <td><%= jid_history["jid"] %></td>
+          <td><%= jid_history["args"] %></td>
+          <td><%= jid_history["enqueued_at"] %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
 
 <header class="row">
   <div class="col-sm-12">

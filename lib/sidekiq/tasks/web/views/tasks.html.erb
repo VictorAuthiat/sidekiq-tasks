@@ -13,6 +13,7 @@
     <thead>
       <tr>
         <th><%= t("name") %></th>
+        <th><%= t("last_enqueued") %></th>
       </tr>
     </thead>
     <tbody>
@@ -23,6 +24,8 @@
               <b><%= task.name %></b>
             </a>
           </td>
+
+          <td><%= task_last_enqueue_at(task) %></td>
         </tr>
       <% end %>
     </tbody>

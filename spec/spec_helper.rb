@@ -22,4 +22,5 @@ RSpec.configure do |config|
   end
 
   config.include FactoryHelper
+  config.include RedisHelper
 end

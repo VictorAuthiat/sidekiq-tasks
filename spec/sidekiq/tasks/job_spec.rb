@@ -15,5 +15,9 @@ RSpec.describe Sidekiq::Tasks::Job do
       expect(Sidekiq::Tasks).to receive(:tasks).and_return(Sidekiq::Tasks::Set.new([]))
       expect { perform }.to raise_error(Sidekiq::Tasks::NotFoundError, "'foo:bar' not found")
     end
+
+    it "returns the correct Sidekiq options" do
+      expect(described_class.sidekiq_options).to eq(Sidekiq::Tasks.config.sidekiq_options.transform_keys(&:to_s))
+    end
   end
 end

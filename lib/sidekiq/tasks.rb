@@ -4,6 +4,7 @@ require "rake"
 
 require_relative "tasks/errors"
 require_relative "tasks/strategies"
+require_relative "tasks/validations"
 require_relative "tasks/version"
 
 module Sidekiq

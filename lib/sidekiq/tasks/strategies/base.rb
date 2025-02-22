@@ -2,6 +2,8 @@ module Sidekiq
   module Tasks
     module Strategies
       class Base
+        include Sidekiq::Tasks::Validations
+
         # A set of rules to fetch tasks.
         #
         # @return [Array<Sidekiq::Tasks::Strategies::Rules::Base>]
@@ -14,6 +16,8 @@ module Sidekiq
         # @raise [Sidekiq::Tasks::ArgumentError] If the rules are not valid instances.
         def initialize(rules: [])
           @rules = rules
+
+          validate_array_classes!(rules, [Sidekiq::Tasks::Strategies::Rules::Base], "rules")
         end
 
         # Returns the name of the strategy.

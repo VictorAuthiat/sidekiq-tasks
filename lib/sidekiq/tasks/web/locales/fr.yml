@@ -1,5 +1,8 @@
 fr:
+  prev: "Précédent"
+  next: "Suivant"
   tasks: "Tâches"
+  filter: "Filtrer"
   no_tasks:  "Aucune tâche trouvée"
   name: "Nom"
   last_enqueued: "Dernière mise en file d'attente"

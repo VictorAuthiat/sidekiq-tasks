@@ -4,9 +4,27 @@
       <%= t("tasks") %>
     </h1>
   </div>
+
+  <form action="<%= root_path %>tasks" class="form form-inline" method="get">
+    <input name="filter" class="form-control" type="text" value="<%= @search.filter %>" />
+
+    <select name="count" class="form-control">
+      <% Sidekiq::Tasks::Web::Search.count_options.each do |count| %>
+        <option value="<%= count %>" <%= "selected" if @search.count == count %>>
+          <%= count %>
+        </option>
+      <% end %>
+    </select>
+
+    <input name="page" type="hidden" value="1" />
+
+    <button class="btn btn-default" type="submit">
+      <%= t("filter") %>
+    </button>
+  </form>
 </header>
 
-<% if @tasks.empty? %>
+<% if @search.tasks.empty? %>
   <%= t("no_tasks") %>
 <% else %>
   <table class="table table-hover table-bordered table-striped table-white">
@@ -17,7 +35,7 @@
       </tr>
     </thead>
     <tbody>
-      <% @tasks.each do |task| %>
+      <% @search.tasks.each do |task| %>
         <tr>
           <td>
             <a href="<%= task_url(root_path, task) %>">
@@ -30,4 +48,10 @@
       <% end %>
     </tbody>
   </table>
+
+  <div class="pull-left">
+    <%= @search.tasks.size %> / <%= Sidekiq::Tasks.tasks.size %>
+  </div>
+
+  <%= render(:erb, read_view(:_pagination), locals: {search: @search}) %>
 <% end %>

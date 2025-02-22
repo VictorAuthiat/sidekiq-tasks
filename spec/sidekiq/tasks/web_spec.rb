@@ -7,7 +7,11 @@ RSpec.describe "Sidekiq::Tasks::Web", type: :request do
 
   describe "GET /tasks" do
     it "correctly renders the tasks page when no tasks are found", :aggregate_failures do
-      expect(Sidekiq::Tasks).to receive(:tasks).and_return(build_task_set)
+      expect(Sidekiq::Tasks.tasks).to(
+        receive(:where)
+          .with(name: nil)
+          .and_return(build_task_set)
+      )
 
       get "/tasks"
 
@@ -15,7 +19,11 @@ RSpec.describe "Sidekiq::Tasks::Web", type: :request do
     end
 
     it "correctly renders the tasks page when tasks are found", :aggregate_failures do
-      expect(Sidekiq::Tasks).to receive(:tasks).and_return(build_task_set(build_task(name: "foo:bar")))
+      expect(Sidekiq::Tasks.tasks).to(
+        receive(:where)
+          .with(name: nil)
+          .and_return(build_task_set(build_task(name: "foo:bar")))
+      )
 
       get "/tasks"
 

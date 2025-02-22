@@ -1,5 +1,8 @@
 en:
+  prev: "Prev"
+  next: "Next"
   tasks: "Tasks"
+  filter: "Filter"
   no_tasks:  "No tasks found"
   name: "Name"
   last_enqueued: "Last enqueued"

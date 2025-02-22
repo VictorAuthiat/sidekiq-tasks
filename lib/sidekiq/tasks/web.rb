@@ -1,5 +1,6 @@
 require "sidekiq/tasks/web/helpers/application_helper"
 require "sidekiq/tasks/web/helpers/task_helper"
+require "sidekiq/tasks/web/search"
 require "sidekiq/tasks/task"
 
 module Sidekiq

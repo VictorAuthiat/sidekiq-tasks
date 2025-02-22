@@ -13,9 +13,9 @@ module Sidekiq
           end
 
           app.get "/tasks" do
-            @tasks = Sidekiq::Tasks.tasks
+            @search = Sidekiq::Tasks::Web::Search.new(params)
 
-            erb(read_view(:tasks), locals: {tasks: @tasks})
+            erb(read_view(:tasks), locals: {search: @search})
           end
 
           app.get "/tasks/:name" do

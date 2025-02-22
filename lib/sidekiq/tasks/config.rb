@@ -7,7 +7,12 @@ module Sidekiq
       }.freeze
 
       DEFAULT_STRATEGIES = [
-        Sidekiq::Tasks::Strategies::RakeTask.new,
+        Sidekiq::Tasks::Strategies::RakeTask.new(
+          rules: [
+            Sidekiq::Tasks::Strategies::Rules::TaskFromLib.new,
+            Sidekiq::Tasks::Strategies::Rules::EnableWithComment.new,
+          ]
+        ),
       ].freeze
 
       include Sidekiq::Tasks::Validations

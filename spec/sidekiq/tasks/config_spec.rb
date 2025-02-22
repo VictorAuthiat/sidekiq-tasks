@@ -8,7 +8,16 @@ RSpec.describe Sidekiq::Tasks::Config do
 
     it "sets the default strategies" do
       expect(described_class.new.strategies).to match_array(
-        [an_instance_of(Sidekiq::Tasks::Strategies::RakeTask)]
+        [
+          an_instance_of(Sidekiq::Tasks::Strategies::RakeTask).and(
+            have_attributes(
+              rules: [
+                an_instance_of(Sidekiq::Tasks::Strategies::Rules::TaskFromLib),
+                an_instance_of(Sidekiq::Tasks::Strategies::Rules::EnableWithComment),
+              ]
+            )
+          ),
+        ]
       )
     end
   end

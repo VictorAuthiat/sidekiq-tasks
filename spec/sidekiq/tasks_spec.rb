@@ -1,53 +1,63 @@
 require "spec_helper"
 
-RSpec.describe Sidekiq::Tasks::Task do
-  describe "validations" do
-    it "accepts Sidekiq::Tasks::TaskMetadata as metadata", :aggregate_failures do
-      expect(build_task(metadata: build_task_metadata).metadata).to be_a(Sidekiq::Tasks::TaskMetadata)
+RSpec.describe Sidekiq::Tasks do
+  it "has a version number" do
+    expect(Sidekiq::Tasks::VERSION).not_to be_nil
+  end
 
-      expect { build_task(metadata: "foo") }.to(
-        raise_error(
-          Sidekiq::Tasks::ArgumentError,
-          "'metadata' must be an instance of Sidekiq::Tasks::TaskMetadata but received String"
-        )
-      )
-    end
-
-    it "accepts Sidekiq::Tasks::Strategies::Base as strategy", :aggregate_failures do
-      expect(build_task(strategy: build_strategy).strategy).to be_a(Sidekiq::Tasks::Strategies::Base)
-
-      expect { build_task(strategy: "foo") }.to(
-        raise_error(
-          Sidekiq::Tasks::ArgumentError,
-          "'strategy' must be an instance of Sidekiq::Tasks::Strategies::Base but received String"
-        )
-      )
+  describe ".configure" do
+    it "yields a Sidekiq::Tasks::Config instance" do
+      expect { |block| described_class.configure(&block) }.to yield_with_args(Sidekiq::Tasks::Config)
     end
   end
 
-  describe "#enqueue" do
-    it "enqueues the task through the strategy with params and stores the task trace" do
-      current_time = Time.new(2025, 1, 1, 12, 0, 0, "+00:00")
-      allow(Time).to receive(:now).and_return(current_time)
+  describe ".config" do
+    before do
+      described_class.instance_variable_set(:@_config, nil)
+    end
 
-      task = build_task(name: "foo:bar", args: ["foo"])
-
-      expect(task.strategy).to(
-        receive(:enqueue_task)
-          .with("foo:bar", {"foo" => "bar"})
-          .and_return("a1b2c3")
-      )
-
-      task.enqueue({"foo" => "bar"})
+    it "returns a memoized instance of Sidekiq::Tasks::Config", :aggregate_failures do
+      config = described_class.config
+      expect(config).to be_a(Sidekiq::Tasks::Config)
+      expect(described_class.config.object_id).to eq(config.object_id)
     end
   end
 
-  describe "#execute" do
-    it "executes the task through the strategy with params", :aggregate_failures do
-      task = build_task(name: "foo:bar", args: ["foo"])
-      execution_result = double
-      expect(task.strategy).to receive(:execute_task).with("foo:bar", {"foo" => "bar"}).and_return(execution_result)
-      expect(task.execute({"foo" => "bar"})).to eq(execution_result)
+  describe ".strategies" do
+    before do
+      described_class.instance_variable_set(:@_strategies, nil)
+    end
+
+    it "returns memoized set of strategies", :aggregate_failures do
+      strategies = [build_strategy, build_strategy]
+
+      expect(described_class.config).to receive(:strategies).and_return(strategies)
+
+      set = described_class.strategies
+
+      expect(set.objects).to eq(strategies)
+      expect(set).to be_a(Sidekiq::Tasks::Set)
+      expect(set.object_id).to eq(described_class.strategies.object_id)
+    end
+  end
+
+  describe ".tasks" do
+    before do
+      described_class.instance_variable_set(:@_tasks, nil)
+    end
+
+    it "finds tasks and returns a memoized instance of Sidekiq::Tasks::Set", :aggregate_failures do
+      strategy = build_strategy
+      tasks = [build_task(name: "foo:bar")]
+
+      expect(described_class).to receive(:strategies).and_return([strategy])
+      expect(strategy).to receive(:tasks).and_return(tasks)
+
+      set = described_class.tasks
+
+      expect(set.objects).to eq(tasks)
+      expect(set).to be_a(Sidekiq::Tasks::Set)
+      expect(set.object_id).to eq(described_class.tasks.object_id)
     end
   end
 end

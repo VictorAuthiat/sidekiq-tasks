@@ -1,8 +1,59 @@
 AllCops:
   TargetRubyVersion: 3.1
+  NewCops: disable
+  SuggestExtensions: false
+
+Layout/SpaceInsideHashLiteralBraces:
+  EnforcedStyle: no_space
+
+Metrics/AbcSize:
+  Exclude:
+    - lib/sidekiq/tasks/web/extension.rb
+
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*
+    - sidekiq-tasks.gemspec
+
+Metrics/MethodLength:
+  Exclude:
+    - lib/sidekiq/tasks/web/extension.rb
+
+Metrics/ParameterLists:
+  Exclude:
+    - spec/**/*
+
+Naming/FileName:
+  Exclude:
+    - lib/sidekiq/sidekiq-tasks.rb
+
+Naming/MemoizedInstanceVariableName:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/GlobalVars:
+  Exclude:
+    - spec/**/*
+
+Style/ModuleFunction:
+  Enabled: false
+
+Style/ParallelAssignment:
+  Enabled: false
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
 
 Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
+
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: consistent_comma

@@ -3,6 +3,10 @@ module FactoryHelper
     FakeStrategy.new(rules: rules)
   end
 
+  def build_task_set(*tasks)
+    Sidekiq::Tasks::Set.new(tasks || [])
+  end
+
   def build_task(name: "foo", file: nil, desc: nil, args: [], strategy: nil, metadata: nil)
     Sidekiq::Tasks::Task.new(
       metadata: metadata || build_task_metadata(name: name, file: file, desc: desc, args: args),

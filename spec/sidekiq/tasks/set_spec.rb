@@ -105,4 +105,11 @@ RSpec.describe Sidekiq::Tasks::Set do
       expect(described_class.new([]).last).to be_nil
     end
   end
+
+  describe "#empty?" do
+    it "returns true when the set is empty", :aggregate_failures do
+      expect(described_class.new([]).empty?).to be(true)
+      expect(described_class.new([double]).empty?).to be(false)
+    end
+  end
 end

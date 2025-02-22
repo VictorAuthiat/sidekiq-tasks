@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
+require "rack/test"
+require "rack/session"
+
+require "sidekiq"
+require "sidekiq/web"
 require "sidekiq/tasks"
+require "sidekiq/tasks/web"
 
 Dir[File.expand_path("support/**/*.rb", __dir__)].sort.each { |file| require file }
 

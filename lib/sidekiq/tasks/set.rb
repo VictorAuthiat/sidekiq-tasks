@@ -43,6 +43,10 @@ module Sidekiq
         objects[-1]
       end
 
+      def empty?
+        objects.empty?
+      end
+
       private
 
       def reflect(objects)

@@ -1,11 +1,7 @@
-<header class="row">
-  <div class="col-sm-5">
-    <h1>
-      <%= t("tasks") %>
-    </h1>
-  </div>
+<div class="header-container">
+  <h1><%= t("tasks") %></h1>
 
-  <form action="<%= root_path %>tasks" class="form form-inline" method="get">
+  <form action="<%= root_path %>tasks" class="form-inline" method="get">
     <input name="filter" class="form-control" type="text" value="<%= @search.filter %>" />
 
     <select name="count" class="form-control">
@@ -16,13 +12,13 @@
       <% end %>
     </select>
 
-    <input name="page" type="hidden" value="1" />
+    <input name="page" type="hidden" value="<%= @search.page %>" />
 
     <button class="btn btn-default" type="submit">
       <%= t("filter") %>
     </button>
   </form>
-</header>
+</div>
 
 <% if @search.tasks.empty? %>
   <%= t("no_tasks") %>

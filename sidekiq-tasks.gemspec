@@ -36,4 +36,17 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "rake", ">= 13.0"
   spec.add_dependency "sidekiq", ">= 6"
+
+  spec.add_development_dependency "base64", "~> 0.1.0"
+  spec.add_development_dependency "capybara", "~> 3.40"
+  spec.add_development_dependency "rack-session", "~> 1.0"
+  spec.add_development_dependency "rack-test", "~> 1.1"
+  spec.add_development_dependency "rake", "~> 13.0"
+  spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "rubocop", "~> 1.21"
+  spec.add_development_dependency "sidekiq", "~> 6.5"
+  spec.add_development_dependency "simplecov", "~> 0.21"
+  spec.add_development_dependency "simplecov-json", "~> 0.2"
+  spec.add_development_dependency "webdrivers", "~> 5.3.1"
+  spec.add_development_dependency "webrick", "~> 1.9.1"
 end

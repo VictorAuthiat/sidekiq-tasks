@@ -2,12 +2,15 @@ require "spec_helper"
 
 RSpec.describe Sidekiq::Tasks::Job do
   describe "#perform" do
-    subject(:perform) { described_class.new.perform("foo:bar", "{\"baz\":\"qux\"}") }
+    subject(:perform) { job.perform("foo:bar", "{\"baz\":\"qux\"}") }
 
-    it "finds the task and executes it", :aggregate_failures do
+    let(:job) { described_class.new }
+
+    it "finds the task and executes it with params and jid", :aggregate_failures do
       task = build_task(name: "foo:bar", args: ["baz"])
       expect(Sidekiq::Tasks).to receive(:tasks).and_return(Sidekiq::Tasks::Set.new([task]))
-      expect(task).to receive(:execute).with({"baz" => "qux"})
+      expect(job).to receive(:jid).and_return("a1b2c3")
+      expect(task).to receive(:execute).with({"baz" => "qux"}, jid: "a1b2c3")
       perform
     end
 

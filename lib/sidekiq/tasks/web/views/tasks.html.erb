@@ -39,7 +39,7 @@
             </a>
           </td>
 
-          <td><%= task_last_enqueue_at(task) %></td>
+          <td><%= task.last_enqueue_at ? relative_time(task.last_enqueue_at) : "-" %></td>
         </tr>
       <% end %>
     </tbody>

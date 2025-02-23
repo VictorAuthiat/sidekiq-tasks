@@ -20,7 +20,7 @@
     </tr>
     <tr>
       <th><%= t("last_enqueued") %></th>
-      <td><%= task_last_enqueue_at(task) %></td>
+      <td><%= task.last_enqueue_at ? relative_time(task.last_enqueue_at) : "-" %></td>
     </tr>
   </tbody>
 </table>
@@ -39,7 +39,8 @@
     <tr>
       <th><%= t("jid") %></th>
       <th><%= t("args") %></th>
-      <th><%= t("enqueued") %></th>
+      <th><%= t("enqueued_at") %></th>
+      <th><%= t("executed_at") %></th>
     </tr>
     </thead>
     <tbody>
@@ -47,7 +48,8 @@
         <tr>
           <td><%= jid_history["jid"] %></td>
           <td><%= jid_history["args"] %></td>
-          <td><%= jid_history["enqueued_at"] %></td>
+          <td><%= jid_history["enqueued_at"] ? relative_time(jid_history["enqueued_at"]) : "-" %></td>
+          <td><%= jid_history["executed_at"] ? relative_time(jid_history["executed_at"]) : "-" %></td>
         </tr>
       <% end %>
     </tbody>

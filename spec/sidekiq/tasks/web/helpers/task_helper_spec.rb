@@ -35,19 +35,4 @@ RSpec.describe Sidekiq::Tasks::Web::Helpers::TaskHelper do
       expect(described_class.task_url("/sidekiq/", build_task(name: "foo:bar"))).to eq("/sidekiq/tasks/foo-bar")
     end
   end
-
-  describe "#task_last_enqueue_at" do
-    it "returns the last enqueue at time for the given task", :aggregate_failures do
-      task = build_task(name: "foo:bar")
-      last_enqueue_at = Time.new(2025, 1, 1, 12, 0, 0, "+00:00")
-      expect(task).to receive(:last_enqueue_at).and_return(last_enqueue_at)
-      expect(described_class.task_last_enqueue_at(task)).to eq(last_enqueue_at)
-    end
-
-    it "returns a dash when the last enqueue at time is nil", :aggregate_failures do
-      task = build_task(name: "foo:bar")
-      expect(task).to receive(:last_enqueue_at).and_return(nil)
-      expect(described_class.task_last_enqueue_at(task)).to eq("-")
-    end
-  end
 end

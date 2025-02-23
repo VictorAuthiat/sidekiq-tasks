@@ -22,10 +22,6 @@ module Sidekiq
           def task_url(root_path, task)
             "#{root_path}tasks/#{parameterize_task_name(task.name)}"
           end
-
-          def task_last_enqueue_at(task)
-            task.last_enqueue_at || "-"
-          end
         end
       end
     end

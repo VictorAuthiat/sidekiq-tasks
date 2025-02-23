@@ -1,5 +1,7 @@
 # Sidekiq::Tasks
 
+[![CI Status](https://github.com/victorauthiat/sidekiq-tasks/actions/workflows/ci.yml/badge.svg)](https://github.com/victorauthiat/sidekiq-tasks/actions/workflows/ci.yml)
+
 > A [Sidekiq](https://github.com/sidekiq/sidekiq) extension for task management.
 
 Sidekiq-Tasks extends Sidekiq by providing an interface to enqueue tasks directly from the web interface. By default it works with Rake tasks but it can be easily extended to support other task execution systems.
@@ -171,4 +173,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Sidekiq::Tasks project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](htt  ps://github.com/victorauthiat/sidekiq-tasks/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the Sidekiq::Tasks project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/victorauthiat/sidekiq-tasks/blob/master/CODE_OF_CONDUCT.md).

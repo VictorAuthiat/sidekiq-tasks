@@ -94,11 +94,13 @@ RSpec.describe Sidekiq::Tasks::Strategies::Rules::EnableWithComment do
     end
 
     it "works with multiple tasks", :aggregate_failures do
-      not_enabled_task = instance_double(Rake::Task, name: "foo:bar", locations: ["foo.rb:2"])
-      enabled_task = instance_double(Rake::Task, name: "foo:baz", locations: ["foo.rb:7"])
+      not_enabled_task_before_enabled_task = instance_double(Rake::Task, name: "foo:bar", locations: ["foo.rb:3"])
+      enabled_task = instance_double(Rake::Task, name: "foo:baz", locations: ["foo.rb:8"])
+      not_enabled_task_after_enabled_task = instance_double(Rake::Task, name: "foo:buz", locations: ["foo.rb:12"])
 
-      expect(File).to receive(:read).with("foo.rb").twice.and_return <<~RUBY
+      expect(File).to receive(:read).with("foo.rb").exactly(3).times.and_return <<~RUBY
         namespace :foo do
+          desc "Send an order confirmation email"
           task :bar do
             puts "bar"
           end
@@ -107,11 +109,16 @@ RSpec.describe Sidekiq::Tasks::Strategies::Rules::EnableWithComment do
           task :baz do
             puts "baz"
           end
+
+          task :buz do
+            puts "buz"
+          end
         end
       RUBY
 
-      expect(described_class.new.respected?(not_enabled_task)).to be(false)
+      expect(described_class.new.respected?(not_enabled_task_before_enabled_task)).to be(false)
       expect(described_class.new.respected?(enabled_task)).to be(true)
+      expect(described_class.new.respected?(not_enabled_task_after_enabled_task)).to be(false)
     end
 
     it "raises an error when the file is not found" do

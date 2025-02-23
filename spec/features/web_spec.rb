@@ -126,7 +126,7 @@ RSpec.describe "Sidekiq::Tasks::Web", type: :feature do
         end
 
         fill_in "name", with: "Foo"
-        click_on "Enqueue"
+        find_button("Enqueue").click
 
         aggregate_failures do
           expect(find_field("name").value).to be_empty
@@ -149,7 +149,7 @@ RSpec.describe "Sidekiq::Tasks::Web", type: :feature do
           expect(page).not_to have_css("input[type='text']")
         end
 
-        click_on "Enqueue"
+        find_button("Enqueue").click
 
         aggregate_failures do
           expect(page).not_to have_content("No history")

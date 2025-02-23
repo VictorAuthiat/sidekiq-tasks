@@ -43,3 +43,30 @@ jobs:
 
       - name: "Run Rubocop"
         run: "bundle exec rubocop"
+
+      - name: "Upload artifacts"
+        if: matrix.ruby == '3.4' && matrix.sidekiq == '~> 7'
+        uses: "actions/upload-artifact@v4"
+        with:
+          name: "coverage-artifacts"
+          path: "${{github.workspace}}/coverage/coverage.json"
+          retention-days: 1
+
+  coverage:
+    name: "Report coverage to Code Climate"
+    runs-on: "ubuntu-20.04"
+    needs: "tests"
+    if: success() && github.ref == 'refs/heads/master'
+    env:
+      CC_TEST_REPORTER_ID: "${{ secrets.CC_TEST_REPORTER_ID }}"
+
+    steps:
+      - uses: "actions/checkout@v3"
+
+      - name: "Download coverage artifacts from test job"
+        uses: "actions/download-artifact@v4"
+        with:
+          name: "coverage-artifacts"
+      - uses: "paambaati/codeclimate-action@v3.2.0"
+        with:
+          coverageLocations: "coverage.json:simplecov"

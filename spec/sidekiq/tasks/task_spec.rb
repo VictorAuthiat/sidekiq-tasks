@@ -98,17 +98,17 @@ RSpec.describe Sidekiq::Tasks::Task do
   describe "#execute" do
     it "executes the task through the strategy with params", :aggregate_failures do
       task = build_task(name: "foo:bar", args: ["foo"])
-      expect(task.strategy).to receive(:execute_task).with("foo:bar", {"foo" => "bar"})
+      expect(task.strategy).to receive(:execute_task).with("foo:bar", {foo: "bar"})
 
-      task.execute({"foo" => "bar"})
+      task.execute({foo: "bar"})
     end
 
     it "stores the execution history with the given jid", :aggregate_failures do
       task = build_task(name: "foo:bar", args: ["foo"])
-      expect(task.strategy).to receive(:execute_task).with("foo:bar", {"foo" => "bar"})
+      expect(task.strategy).to receive(:execute_task).with("foo:bar", {foo: "bar"})
       expect(task.storage).to receive(:store_execution).with("a1b2c3")
 
-      task.execute({"foo" => "bar"}, jid: "a1b2c3")
+      task.execute({foo: "bar"}, jid: "a1b2c3")
     end
   end
 end

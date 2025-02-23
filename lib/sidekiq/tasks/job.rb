@@ -11,7 +11,8 @@ module Sidekiq
       # @param args [Hash] The arguments to pass to the task.
       # @raise [Sidekiq::Tasks::TaskNotFoundError] If the task is not found.
       def perform(name, args)
-        Sidekiq::Tasks.tasks.find_by!(name: name).execute(JSON.parse(args), jid: jid)
+        symbolized_args = JSON.parse(args, symbolize_names: true)
+        Sidekiq::Tasks.tasks.find_by!(name: name).execute(symbolized_args, jid: jid)
       end
     end
   end

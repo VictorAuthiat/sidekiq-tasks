@@ -36,9 +36,9 @@ RSpec.describe Sidekiq::Tasks::Strategies::RakeTask do
       rake_task = build_rake_task(name: "foo:bar")
 
       expect(Rake::Task).to receive(:[]).with("foo:bar").and_return(rake_task)
-      expect(rake_task).to receive(:execute).with({"bar" => "baz"})
+      expect(rake_task).to receive(:execute).with({bar: "baz"})
 
-      described_class.new.execute_task("foo:bar", {"bar" => "baz"})
+      described_class.new.execute_task("foo:bar", {bar: "baz"})
     end
   end
 end

@@ -1,6 +1,10 @@
 module Sidekiq
   module Tasks
     class Set
+      extend Forwardable
+
+      def_delegators :objects, :[], :each, :size, :first, :last, :empty?
+
       include Enumerable
 
       def self.match?(object, attributes)
@@ -15,10 +19,6 @@ module Sidekiq
         @objects = objects
       end
 
-      def each(&block)
-        objects.each(&block)
-      end
-
       def where(attributes = {})
         reflect(objects.select { |object| self.class.match?(object, attributes) })
       end
@@ -29,22 +29,6 @@ module Sidekiq
 
       def find_by!(name: nil)
         find_by(name: name) || raise(NotFoundError, "'#{name}' not found")
-      end
-
-      def size
-        objects.size
-      end
-
-      def first
-        objects[0]
-      end
-
-      def last
-        objects[-1]
-      end
-
-      def empty?
-        objects.empty?
       end
 
       private

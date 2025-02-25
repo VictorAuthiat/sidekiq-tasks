@@ -26,6 +26,7 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
+  config.include EnvHelper
   config.include FactoryHelper
   config.include RedisHelper
 end

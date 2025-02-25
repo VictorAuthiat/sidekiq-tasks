@@ -21,12 +21,16 @@ module Sidekiq
           app.get "/tasks/:name" do
             @task = find_task!(params["name"])
 
-            erb(read_view(:_task), locals: {task: @task})
+            erb(read_view(:task), locals: {task: @task})
           rescue Sidekiq::Tasks::NotFoundError
             throw :halt, [404, {Rack::CONTENT_TYPE => "text/plain"}, ["Task not found"]]
           end
 
           app.post "/tasks/:name/enqueue" do
+            if params["env_confirmation"] != current_env
+              throw :halt, [400, {Rack::CONTENT_TYPE => "text/plain"}, ["Invalid confirm"]]
+            end
+
             task = find_task!(params["name"])
             args = Sidekiq::Tasks::Web::Params.new(task, params["args"]).permit!
 

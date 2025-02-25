@@ -10,6 +10,10 @@ module Sidekiq
           def read_view(name)
             File.read(File.join(VIEW_PATH, "#{name}.html.erb"))
           end
+
+          def current_env
+            ENV["RAILS_ENV"] || ENV["RACK_ENV"]
+          end
         end
       end
     end

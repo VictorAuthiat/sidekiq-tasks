@@ -1,5 +1,5 @@
 <header class="row">
-  <div class="span col-sm-5 pull-left">
+  <div class="col-sm-5 pull-left">
     <h1><%= t("task") %></h1>
   </div>
 </header>
@@ -39,8 +39,8 @@
     <tr>
       <th><%= t("jid") %></th>
       <th><%= t("args") %></th>
-      <th><%= t("enqueued_at") %></th>
-      <th><%= t("executed_at") %></th>
+      <th><%= t("enqueued") %></th>
+      <th><%= t("executed") %></th>
     </tr>
     </thead>
     <tbody>
@@ -65,20 +65,39 @@
 <form action="<%= task_url(root_path, task) %>/enqueue" method="post">
   <%= csrf_tag %>
 
-  <div class="container">
-    <div class="row">
-      <% task.args.each do |arg| %>
-        <div class="col-md-6 mb-3">
-          <div class="form-group">
-            <label for="<%= arg %>" class="form-label"><%= arg %></label>
-            <input type="text" class="form-control" name="args[<%= arg %>]" id="<%= arg %>" />
-          </div>
+  <div class="row">
+    <% task.args.each do |arg| %>
+      <div class="col-sm-6">
+        <div class="form-group">
+          <label for="<%= arg %>"><%= arg %></label>
+          <input type="text" id="<%= arg %>" class="form-control" name="args[<%= arg %>]"/>
         </div>
-      <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="form-group">
+        <label for="confirmInput">
+          <%= t("env_confirmation", current_env: current_env) %>
+        </label>
+
+        <input
+          type="text"
+          id="envConfirmationInput"
+          class="form-control"
+          name="env_confirmation"
+          data-current-env="<%= current_env %>"
+          required
+        />
+      </div>
     </div>
   </div>
 
-  <button type="submit" class="btn btn-primary">
+  <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
     <%= t("enqueue") %>
   </button>
 </form>
+
+<script type="text/javascript" src="<%= root_path %>javascripts/env_confirmation.js"></script>

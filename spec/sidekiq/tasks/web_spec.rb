@@ -3,7 +3,18 @@ require "spec_helper"
 RSpec.describe "Sidekiq::Tasks::Web", type: :request do
   include Rack::Test::Methods
 
-  let(:app) { Sidekiq::Web }
+  def app
+    @app ||= Sidekiq::Web.new
+  end
+
+  before do
+    if Sidekiq::Tasks::Web::SIDEKIQ_GTE_7_3_0
+      Sidekiq::Web.configure do |config|
+        config.middlewares.clear
+        config.use Rack::Session::Cookie, secrets: "fake_secret_key" * 10, same_site: true, max_age: 86_400
+      end
+    end
+  end
 
   describe "GET /tasks" do
     it "correctly renders the tasks page when no tasks are found", :aggregate_failures do

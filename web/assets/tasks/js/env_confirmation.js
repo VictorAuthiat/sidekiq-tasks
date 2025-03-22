@@ -1,10 +1,10 @@
-class EnvConfirmationController {
+class EnvConfirmation {
   constructor(envConfirmationInputSelector, submitBtnSelector) {
     this.envConfirmationInput = document.querySelector(envConfirmationInputSelector);
     this.submitBtn = document.querySelector(submitBtnSelector);
   }
 
-  connect() {
+  init() {
     this.submitBtn.disabled = true;
     this.currentEnv = this.envConfirmationInput.dataset.currentEnv;
     this.envConfirmationInput.addEventListener("input", this.#handleInputChange.bind(this));
@@ -16,5 +16,5 @@ class EnvConfirmationController {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-  new EnvConfirmationController("#envConfirmationInput", "#submitBtn").connect();
+  new EnvConfirmation("#envConfirmationInput", "#submitBtn").init();
 });

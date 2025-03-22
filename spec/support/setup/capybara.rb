@@ -32,4 +32,4 @@ end
 
 Capybara.app = rack_app_builder.to_app
 Capybara.server = ENV.fetch("CAPYBARA_SERVER", "webrick").to_sym
-Capybara.default_driver = ENV.fetch("CAPYBARA_DRIVER", "selenium_chrome").to_sym
+Capybara.default_driver = ENV.fetch("CAPYBARA_DRIVER", "selenium_chrome_headless").to_sym

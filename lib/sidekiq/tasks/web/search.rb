@@ -2,10 +2,10 @@ module Sidekiq
   module Tasks
     module Web
       class Search
-        DEFAULT_COUNT = 25
+        DEFAULT_COUNT = 15
 
         def self.count_options
-          (1..4).map { |index| index * DEFAULT_COUNT }
+          (0..3).map { |index| DEFAULT_COUNT * (2**index) }
         end
 
         attr_reader :params

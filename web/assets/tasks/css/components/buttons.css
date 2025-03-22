@@ -1,0 +1,41 @@
+:root {
+  --st-button-bg: #b1003e;
+  --st-button-text: white;
+  --st-button-border: none;
+  --st-button-hover-bg: #900030;
+  --st-button-disabled-bg: #ccc;
+  --st-button-disabled-text: #666;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --st-button-bg: #900030;
+    --st-button-text: white;
+    --st-button-border: none;
+    --st-button-hover-bg: #700024;
+    --st-button-disabled-bg: #555;
+    --st-button-disabled-text: #aaa;
+  }
+}
+
+.st-button {
+  background-color: var(--st-button-bg);
+  color: var(--st-button-text);
+  border: var(--st-button-border);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.st-button:hover {
+  background-color: var(--st-button-hover-bg);
+}
+
+.st-button:disabled {
+  background-color: var(--st-button-disabled-bg);
+  color: var(--st-button-disabled-text);
+  cursor: not-allowed;
+}
+

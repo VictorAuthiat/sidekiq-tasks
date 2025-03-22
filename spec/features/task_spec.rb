@@ -4,6 +4,7 @@ RSpec.describe "Task page", type: :feature do
   before do
     stub_env("RAILS_ENV", "development")
     allow(Sidekiq::Tasks).to receive(:tasks).and_return(tasks)
+    allow(Sidekiq::Tasks::Job).to receive(:perform_async).and_return("a1b2c3")
   end
 
   let(:tasks) do
@@ -18,21 +19,23 @@ RSpec.describe "Task page", type: :feature do
     expect(page).to have_content("Task not found")
   end
 
-  it "displays the task details", :aggregate_failures do
+  it "displays the task details" do
     visit "/tasks/tests-task_with_args"
 
-    expect(page).to have_content("tests:task_with_args")
-    expect(page).to have_content("Task with arg")
-    expect(page).to have_content("RakeTask")
+    aggregate_failures do
+      expect(page).to have_content("tests:task_with_args")
+      expect(page).to have_content("Task with arg")
+      expect(page).to have_content("RakeTask")
+    end
   end
 
-  it "Displays an empty state when history is not found" do
+  it "displays an empty state when history is not found" do
     clear_redis
     visit "/tasks/tests-task_with_args"
     expect(page).to have_content("No history")
   end
 
-  it "Displays history when exist" do
+  it "displays history when exist" do
     allow(Sidekiq::Tasks.tasks.find_by!(name: "task_with_args")).to receive(:history).and_return(
       [
         {
@@ -79,13 +82,13 @@ RSpec.describe "Task page", type: :feature do
     visit "/tasks/tests-task_with_args"
     fill_in "env_confirmation", with: "development"
     fill_in "name", with: "Foo"
-
-    find_button("Enqueue").click
+    click_button("Enqueue")
+    expect(page).to have_current_path("/tasks/tests-task_with_args")
 
     aggregate_failures do
-      expect(find_field("name").value).to be_empty
       expect(page).not_to have_content("No history")
       expect(page).to have_content({"name" => "Foo"}.to_s)
+      expect(find_field("name").value).to be_empty
     end
   end
 
@@ -96,8 +99,8 @@ RSpec.describe "Task page", type: :feature do
 
     visit "/tasks/tests-task_without_args"
     fill_in "env_confirmation", with: "development"
-
-    find_button("Enqueue").click
+    click_button("Enqueue")
+    expect(page).to have_current_path("/tasks/tests-task_without_args")
 
     aggregate_failures do
       expect(page).not_to have_content("No history")

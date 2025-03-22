@@ -1,25 +1,27 @@
+require "sidekiq/tasks/web/helpers/application_helper"
+require "sidekiq/tasks/web/helpers/task_helper"
+require "sidekiq/tasks/web/helpers/pagination_helper"
+require "sidekiq/tasks/web/search"
+require "sidekiq/tasks/web/pagination"
+require "sidekiq/tasks/web/params"
+
 module Sidekiq
   module Tasks
     module Web
       class Extension
-        LOCALES_PATH = File.expand_path("../web/locales", __dir__).freeze
-
         def self.registered(app)
-          app.settings.locales << File.join(LOCALES_PATH)
-
-          app.helpers do
-            include Sidekiq::Tasks::Web::Helpers::ApplicationHelper
-            include Sidekiq::Tasks::Web::Helpers::TaskHelper
-          end
+          app.helpers(Sidekiq::Tasks::Web::Helpers::ApplicationHelper)
+          app.helpers(Sidekiq::Tasks::Web::Helpers::TaskHelper)
+          app.helpers(Sidekiq::Tasks::Web::Helpers::PaginationHelper)
 
           app.get "/tasks" do
-            @search = Sidekiq::Tasks::Web::Search.new(params)
+            @search = Sidekiq::Tasks::Web::Search.new(params.transform_keys(&:to_sym))
 
             erb(read_view(:tasks), locals: {search: @search})
           end
 
           app.get "/tasks/:name" do
-            @task = find_task!(params["name"])
+            @task = find_task!(env["rack.route_params"][:name])
 
             erb(read_view(:task), locals: {task: @task})
           rescue Sidekiq::Tasks::NotFoundError
@@ -31,7 +33,7 @@ module Sidekiq
               throw :halt, [400, {Rack::CONTENT_TYPE => "text/plain"}, ["Invalid confirm"]]
             end
 
-            task = find_task!(params["name"])
+            task = find_task!(env["rack.route_params"][:name])
             args = Sidekiq::Tasks::Web::Params.new(task, params["args"]).permit!
 
             task.enqueue(args)

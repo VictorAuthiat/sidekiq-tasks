@@ -5,10 +5,8 @@ module Sidekiq
         module ApplicationHelper
           extend self
 
-          VIEW_PATH = File.expand_path("../../web/views", __dir__).freeze
-
           def read_view(name)
-            File.read(File.join(VIEW_PATH, "#{name}.html.erb"))
+            File.read(File.join(Sidekiq::Tasks::Web::ROOT, "views", "#{name}.erb"))
           end
 
           def current_env

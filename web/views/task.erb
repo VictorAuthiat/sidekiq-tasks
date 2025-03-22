@@ -1,10 +1,14 @@
-<header class="row">
-  <div class="col-sm-5 pull-left">
-    <h1><%= t("task") %></h1>
-  </div>
+<% if Sidekiq::Tasks::Web::SIDEKIQ_GTE_7_3_0 %>
+  <% style_tag "tasks/css/ext.css" %>
+<% else %>
+  <link href="<%= root_path %>tasks/css/ext.css" media="screen" rel="stylesheet" type="text/css"/>
+<% end %>
+
+<header class="st-header">
+  <h1><%= t("task") %></h1>
 </header>
 
-<table class="table table-bordered table-striped">
+<table class="st-table">
   <tbody>
     <tr>
       <th><%= t("name") %></th>
@@ -25,8 +29,8 @@
   </tbody>
 </table>
 
-<header class="row">
-  <div class="col-sm-12">
+<header class="">
+  <div class="">
     <h2><%= t("history") %></h2>
   </div>
 </header>
@@ -34,7 +38,7 @@
 <% if task.history.empty? %>
   <p><%= t("no_history") %></p>
 <% else %>
-  <table class="table table-hover table-bordered table-striped">
+  <table class="st-table">
     <thead>
     <tr>
       <th><%= t("jid") %></th>
@@ -56,48 +60,38 @@
   </table>
 <% end %>
 
-<header class="row">
-  <div class="col-sm-12">
+<header class="">
+  <div class="">
     <h2><%= t("run_task") %></h2>
   </div>
 </header>
 
-<form action="<%= task_url(root_path, task) %>/enqueue" method="post">
+<form action="<%= task_url(root_path, task) %>/enqueue" method="post" class="st-form-container">
   <%= csrf_tag %>
 
-  <div class="row">
+  <div class="st-form-row">
     <% task.args.each do |arg| %>
-      <div class="col-sm-6">
-        <div class="form-group">
-          <label for="<%= arg %>"><%= arg %></label>
-          <input type="text" id="<%= arg %>" class="form-control" name="args[<%= arg %>]"/>
-        </div>
+      <div class="st-form-group">
+        <label for="<%= arg %>" class="st-label"><%= arg %></label>
+        <input type="text" id="<%= arg %>" class="st-input" name="args[<%= arg %>]"/>
       </div>
     <% end %>
   </div>
 
-  <div class="row">
-    <div class="col-sm-6">
-      <div class="form-group">
-        <label for="confirmInput">
-          <%= t("env_confirmation", current_env: current_env) %>
-        </label>
-
-        <input
-          type="text"
-          id="envConfirmationInput"
-          class="form-control"
-          name="env_confirmation"
-          data-current-env="<%= current_env %>"
-          required
-        />
-      </div>
-    </div>
+  <div class="st-form-group-full">
+    <label for="envConfirmationInput" class="st-label">
+      <%= t("env_confirmation", current_env: current_env) %>
+    </label>
+    <input type="text" id="envConfirmationInput" class="st-input" name="env_confirmation" data-current-env="<%= current_env %>" required/>
   </div>
 
-  <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+  <button type="submit" class="st-button" id="submitBtn" disabled> 
     <%= t("enqueue") %>
   </button>
 </form>
 
-<script type="text/javascript" src="<%= root_path %>javascripts/env_confirmation.js"></script>
+<% if Sidekiq::Tasks::Web::SIDEKIQ_GTE_7_3_0 %>
+  <%= script_tag "tasks/js/env_confirmation.js" %>
+<% else %>
+  <script type="text/javascript" src="<%= root_path %>tasks/js/env_confirmation.js"></script>
+<% end %>

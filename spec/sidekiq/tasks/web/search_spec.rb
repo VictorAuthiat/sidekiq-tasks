@@ -5,7 +5,7 @@ RSpec.describe Sidekiq::Tasks::Web::Search do
     it "returns the count options based on the default count" do
       stub_const("Sidekiq::Tasks::Web::Search::DEFAULT_COUNT", 25)
 
-      expect(described_class.count_options).to eq([25, 50, 75, 100])
+      expect(described_class.count_options).to eq([25, 50, 100, 200])
     end
   end
 

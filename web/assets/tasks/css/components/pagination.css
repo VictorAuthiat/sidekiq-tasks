@@ -1,0 +1,52 @@
+:root {
+  --st-pagination-text: #b1003e;
+  --st-pagination-active-opacity: 0.5;
+  --st-pagination-disabled-text: #ccc;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --st-pagination-text: #ff4d79;
+    --st-pagination-active-opacity: 0.7;
+    --st-pagination-disabled-text: #555;
+  }
+}
+
+.st-pagination-wrapper {
+  overflow-x: auto;
+  padding-bottom: 10px;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.st-pagination {
+  display: flex;
+  gap: 5px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.st-page-item {
+  display: flex;
+}
+
+a.st-page-link {
+  text-decoration: none;
+  display: block;
+  color: var(--st-pagination-text);
+  font-size: 14px;
+  transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+a.st-page-link.active {
+  opacity: var(--st-pagination-active-opacity);
+}
+
+a.st-page-link.disabled {
+  pointer-events: none;
+  color: var(--st-pagination-disabled-text);
+}
+

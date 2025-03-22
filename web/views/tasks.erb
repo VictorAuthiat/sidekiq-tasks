@@ -1,10 +1,14 @@
-<div class="header-container">
-  <h1><%= t("tasks") %></h1>
+<% if Sidekiq::Tasks::Web::SIDEKIQ_GTE_7_3_0 %>
+  <% style_tag "tasks/css/ext.css" %>
+<% else %>
+  <link href="<%= root_path %>tasks/css/ext.css" media="screen" rel="stylesheet" type="text/css"/>
+<% end %>
 
-  <form action="<%= root_path %>tasks" class="form-inline" method="get">
-    <input name="filter" class="form-control" type="text" value="<%= @search.filter %>" />
+<header class="st-header">
+  <form action="<%= root_path %>tasks" method="get" class="st-search-form">
+    <input name="filter" class="st-input" type="text" value="<%= @search.filter %>" placeholder="<%= t("search") %>">
 
-    <select name="count" class="form-control">
+    <select name="count" class="st-select">
       <% Sidekiq::Tasks::Web::Search.count_options.each do |count| %>
         <option value="<%= count %>" <%= "selected" if @search.count == count %>>
           <%= count %>
@@ -12,18 +16,16 @@
       <% end %>
     </select>
 
-    <input name="page" type="hidden" value="<%= @search.page %>" />
-
-    <button class="btn btn-default" type="submit">
+    <button type="submit" class="st-button st-button-primary">
       <%= t("filter") %>
     </button>
   </form>
-</div>
+</header>
 
 <% if @search.tasks.empty? %>
   <%= t("no_tasks") %>
 <% else %>
-  <table class="table table-hover table-bordered table-striped table-white">
+  <table class="st-table">
     <thead>
       <tr>
         <th><%= t("name") %></th>
@@ -34,7 +36,7 @@
       <% @search.tasks.each do |task| %>
         <tr>
           <td>
-            <a href="<%= task_url(root_path, task) %>">
+            <a href="<%= task_url(root_path, task) %>" class="st-text-primary">
               <b><%= task.name %></b>
             </a>
           </td>
@@ -45,9 +47,5 @@
     </tbody>
   </table>
 
-  <div class="pull-left">
-    <%= @search.tasks.size %> / <%= Sidekiq::Tasks.tasks.size %>
-  </div>
-
-  <%= render(:erb, read_view(:_pagination), locals: {search: @search}) %>
+  <%= erb(read_view(:_pagination), locals: {search: @search}) %>
 <% end %>

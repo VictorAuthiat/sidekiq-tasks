@@ -6,6 +6,10 @@ AllCops:
 Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
 
+Layout/LineLength:
+  Exclude:
+    - spec/**/*
+
 Metrics/AbcSize:
   Exclude:
     - lib/sidekiq/tasks/web/extension.rb
@@ -22,6 +26,10 @@ Metrics/MethodLength:
 Metrics/ParameterLists:
   Exclude:
     - spec/**/*
+
+Metrics/PerceivedComplexity:
+  Exclude:
+    - lib/sidekiq/tasks/web/extension.rb
 
 Naming/FileName:
   Exclude:
@@ -57,3 +65,6 @@ Style/TrailingCommaInArrayLiteral:
 
 Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: consistent_comma
+
+Style/WordArray:
+  Enabled: false

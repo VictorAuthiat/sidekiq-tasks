@@ -56,10 +56,20 @@ task :my_task do
 end
 ```
 
+You can also use `DisableWithComment` rule to selectively **exclude** tasks. (see [strategies configuration](#strategies-configuration))
+It works similarly to `EnableWithComment`, but with inverted logic. Example of a disabled task:
+
+```ruby
+# sidekiq-tasks:disable
+task :my_task do
+  puts "my_task"
+end
+```
+
 ## Strategies configuration
 
 Strategies can be configured through the `config.strategies` option.
-For example if you want to remove the `EnableWithComment` rule from the default strategy and enable all tasks from the `lib` folder:
+For example if you want to enable all tasks in the lib folder and disable a few specific ones manually:
 
 ```ruby
 Sidekiq::Tasks.configure do |config|
@@ -67,6 +77,7 @@ Sidekiq::Tasks.configure do |config|
     Sidekiq::Tasks::Strategies::RakeTask.new(
       rules: [
         Sidekiq::Tasks::Strategies::Rules::TaskFromLib.new,
+        Sidekiq::Tasks::Strategies::Rules::DisableWithComment.new,
       ]
     )
   ]

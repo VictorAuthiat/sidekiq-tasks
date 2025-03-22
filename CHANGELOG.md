@@ -3,6 +3,7 @@
 ### [Unreleased]
 
 - Change required Ruby version to 3.0.0.
+- Add `DisableWithComment` rule to disable a specific task with a magic comment.
 
 ### [0.1.2] - 2025-03-22
 

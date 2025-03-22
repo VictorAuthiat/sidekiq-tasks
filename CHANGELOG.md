@@ -1,6 +1,6 @@
 ## Changelog
 
-### [Unreleased]
+### [0.1.2] - 2025-03-22
 
 - Update plugin registration for Sidekiq 7.3+ compatibility.
 

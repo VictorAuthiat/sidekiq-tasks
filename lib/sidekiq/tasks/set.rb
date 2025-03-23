@@ -9,7 +9,12 @@ module Sidekiq
 
       def self.match?(object, attributes)
         attributes.any? do |attribute, value|
-          [nil, ""].include?(value) || object.public_send(attribute)&.match?(value)
+          next true if [nil, ""].include?(value)
+
+          object_value = object.public_send(attribute).to_s.downcase.gsub(/[^a-z0-9]/, "")
+          search_fragments = value.to_s.downcase.gsub(/[^a-z0-9\s]/, "").split
+
+          search_fragments.all? { |fragment| object_value.include?(fragment) }
         end
       end
 

@@ -3,10 +3,23 @@ require "spec_helper"
 RSpec.describe Sidekiq::Tasks::Set do
   describe ".match?" do
     it "returns true when the object matches the attributes", :aggregate_failures do
-      task = build_task(name: "foo:bar", desc: "foo", args: ["baz"], file: "foo.rb")
+      task = build_task(name: "foo:bar:baz", desc: "My Description", args: ["baz"], file: "foo.rb")
 
+      expect(described_class.match?(task, name: "foo")).to be(true)
+      expect(described_class.match?(task, name: " foo ")).to be(true)
+      expect(described_class.match?(task, name: "foo bar")).to be(true)
+      expect(described_class.match?(task, name: "foo baz")).to be(true)
       expect(described_class.match?(task, name: "foo:bar")).to be(true)
-      expect(described_class.match?(task, desc: "foo")).to be(true)
+      expect(described_class.match?(task, name: "foo:bar:baz")).to be(true)
+      expect(described_class.match?(task, name: "foobarbaz")).to be(true)
+      expect(described_class.match?(task, name: "foobabaz")).to be(false)
+      expect(described_class.match?(task, name: "FOO:BAR")).to be(true)
+      expect(described_class.match?(task, name: " BAR")).to be(true)
+      expect(described_class.match?(task, name: " baz ")).to be(true)
+      expect(described_class.match?(task, name: "somethingelse")).to be(false)
+      expect(described_class.match?(task, desc: "mydescription")).to be(true)
+      expect(described_class.match?(task, desc: "My  Desc")).to be(true)
+      expect(described_class.match?(task, file: "foo")).to be(true)
       expect(described_class.match?(task, file: "foo.rb")).to be(true)
     end
   end

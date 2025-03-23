@@ -4,6 +4,7 @@
 
 - Fix gem load error by moving the entrypoint to the correct path.
 - Support enabling/disabling all tasks in a namespace with a magic comment.
+- Improve task search to allow more flexible and intuitive matching.
 
 ### [0.1.3] - 2025-03-22
 

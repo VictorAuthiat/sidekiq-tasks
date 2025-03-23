@@ -1,5 +1,9 @@
 ## Changelog
 
+### [Unreleased]
+
+- Fix gem load error by moving the entrypoint to the correct path.
+
 ### [0.1.3] - 2025-03-22
 
 - Change required Ruby version to 3.0.0.

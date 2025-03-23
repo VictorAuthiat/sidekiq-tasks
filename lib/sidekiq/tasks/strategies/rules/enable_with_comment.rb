@@ -4,11 +4,19 @@ module Sidekiq
       module Rules
         class EnableWithComment < Base
           def respected?(task)
-            lines = relevant_lines(task)
+            file, line_number = task.locations.first.split(":")
+            line_number = line_number.to_i
 
-            return false if lines.first.match?(/namespace/)
+            lines = read_file_lines(file)
 
-            lines.any? { |line| line.strip.match?(magic_comment_regex) }
+            return false if lines.nil?
+
+            return true if task_has_magic_comment?(lines, line_number)
+
+            namespace_line_index = find_namespace_line_index(lines, task)
+            return false unless namespace_line_index
+
+            namespace_has_magic_comment?(lines, namespace_line_index)
           end
 
           protected
@@ -19,12 +27,31 @@ module Sidekiq
 
           private
 
-          def relevant_lines(task)
-            file, start_line = task.locations.first.split(":")
-            start_line_counting_desc = start_line.to_i > 2 ? start_line.to_i - 3 : 0
-            File.read(file).split("\n")[start_line_counting_desc..start_line_counting_desc + 1].reverse
+          def read_file_lines(file)
+            File.read(file).split("\n")
           rescue Errno::ENOENT
             raise ArgumentError, "File '#{file}' not found"
+          end
+
+          def task_has_magic_comment?(lines, task_line)
+            context_range = (task_line - 3..task_line).to_a.select { |i| i >= 0 }
+            context_range.reverse.any? do |i|
+              lines[i]&.strip&.match?(magic_comment_regex)
+            end
+          end
+
+          def find_namespace_line_index(lines, task)
+            namespace = namespace_name(task)
+            lines.find_index { |line| line.strip.match?(/^namespace\s+:#{Regexp.escape(namespace)}/) }
+          end
+
+          def namespace_has_magic_comment?(lines, namespace_line_index)
+            comment_line = lines[namespace_line_index - 1]&.strip
+            comment_line&.match?(magic_comment_regex)
+          end
+
+          def namespace_name(task)
+            task.name.split(":").first
           end
         end
       end

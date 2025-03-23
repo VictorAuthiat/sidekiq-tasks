@@ -78,19 +78,25 @@ RSpec.describe Sidekiq::Tasks::Strategies::Rules::EnableWithComment do
       expect(described_class.new.respected?(task)).to be(false)
     end
 
-    it "is not respected when the task has a magic comment before the namespace", :aggregate_failures do
-      task = instance_double(Rake::Task, name: "foo:bar", locations: ["foo.rb:3"])
+    it "is respected when the task has a magic comment before the namespace", :aggregate_failures do
+      bar_task = instance_double(Rake::Task, name: "foo:bar", locations: ["foo.rb:3"])
+      baz_task = instance_double(Rake::Task, name: "foo:baz", locations: ["foo.rb:8"])
 
-      expect(File).to receive(:read).with("foo.rb").and_return <<~RUBY
+      expect(File).to receive(:read).exactly(2).times.with("foo.rb").and_return <<~RUBY
         # sidekiq-tasks:enable
         namespace :foo do
           task :bar do
             puts "bar"
           end
+
+          task :baz do
+            puts "baz"
+          end
         end
       RUBY
 
-      expect(described_class.new.respected?(task)).to be(false)
+      expect(described_class.new.respected?(bar_task)).to be(true)
+      expect(described_class.new.respected?(baz_task)).to be(true)
     end
 
     it "works with multiple tasks", :aggregate_failures do

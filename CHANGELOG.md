@@ -1,6 +1,6 @@
 ## Changelog
 
-### [Unreleased]
+### [0.1.4] - 2025-03-23
 
 - Fix gem load error by moving the entrypoint to the correct path.
 - Support enabling/disabling all tasks in a namespace with a magic comment.

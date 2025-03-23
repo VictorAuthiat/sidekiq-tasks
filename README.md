@@ -47,7 +47,7 @@ By default, it comes with the `Sidekiq::Tasks::Strategies::RakeTask` strategy, w
 > - **`TaskFromLib`** Only tasks from the `lib` folder are loaded.
 > - **`EnableWithComment`** Only tasks explicitly enabled with a magic comment are loaded.
 
-Example of an available task in `lib/tasks/my_task.rake`:
+Example of an enabled task in `lib/tasks/my_task.rake`:
 
 ```ruby
 # sidekiq-tasks:enable
@@ -56,7 +56,22 @@ task :my_task do
 end
 ```
 
-You can also use `DisableWithComment` rule to selectively **exclude** tasks. (see [strategies configuration](#strategies-configuration))
+Enable all tasks within a namespace:
+
+```ruby
+# sidekiq-tasks:enable
+namespace :my_namespace do
+  task :my_task do
+    puts "my_task"
+  end
+
+  task :another_task do
+    puts "another_task"
+  end
+end
+```
+
+You can also use `DisableWithComment` rule to selectively **disable** tasks. (see [strategies configuration](#strategies-configuration))
 It works similarly to `EnableWithComment`, but with inverted logic. Example of a disabled task:
 
 ```ruby

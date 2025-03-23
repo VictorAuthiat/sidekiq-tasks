@@ -33,7 +33,7 @@ Metrics/PerceivedComplexity:
 
 Naming/FileName:
   Exclude:
-    - lib/sidekiq/sidekiq-tasks.rb
+    - lib/sidekiq-tasks.rb
 
 Naming/MemoizedInstanceVariableName:
   Enabled: false

@@ -3,6 +3,7 @@
 ### [Unreleased]
 
 - Add duration, status and error reports to history.
+- Fix Code Climate report by updating CI runner from `ubuntu-20.04` to `ubuntu-22.04`.
 
 ### [0.1.4] - 2025-03-23
 

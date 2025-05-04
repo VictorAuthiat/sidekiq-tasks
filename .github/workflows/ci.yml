@@ -76,7 +76,7 @@ jobs:
 
   coverage:
     name: "Report coverage to Code Climate"
-    runs-on: "ubuntu-20.04"
+    runs-on: "ubuntu-22.04"
     needs: "tests"
     if: success() && github.ref == 'refs/heads/master'
     env:

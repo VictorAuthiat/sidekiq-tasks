@@ -35,30 +35,51 @@
   </div>
 </header>
 
-<% if task.history.empty? %>
-  <p><%= t("no_history") %></p>
-<% else %>
-  <table class="st-table">
-    <thead>
-    <tr>
-      <th><%= t("jid") %></th>
-      <th><%= t("args") %></th>
-      <th><%= t("enqueued") %></th>
-      <th><%= t("executed") %></th>
-    </tr>
-    </thead>
-    <tbody>
-      <% task.history.each do |jid_history| %>
-        <tr>
-          <td><%= jid_history["jid"] %></td>
-          <td><%= jid_history["args"] %></td>
-          <td><%= jid_history["enqueued_at"] ? relative_time(jid_history["enqueued_at"]) : "-" %></td>
-          <td><%= jid_history["executed_at"] ? relative_time(jid_history["executed_at"]) : "-" %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-<% end %>
+<div class="st-table-container">
+  <% if task.history.empty? %>
+    <p><%= t("no_history") %></p>
+  <% else %>
+    <table class="st-table">
+      <thead>
+      <tr>
+        <th><%= t("jid") %></th>
+        <th><%= t("args") %></th>
+        <th><%= t("enqueued") %></th>
+        <th><%= t("executed") %></th>
+        <th><%= t("duration") %></th>
+        <th><%= t("status") %></th>
+      </tr>
+      </thead>
+      <tbody>
+        <% task.history.each do |jid_history| %>
+          <tr>
+            <td><%= jid_history["jid"] %></td>
+            <td>
+              <code><%= jid_history["args"] %></code>
+            </td>
+            <td>
+              <%= jid_history["enqueued_at"] ? jid_history["enqueued_at"].strftime(t("task_time")) : "-" %>
+            </td>
+            <td>
+              <%= jid_history["executed_at"] ? jid_history["executed_at"].strftime(t("task_time")) : "-" %>
+            </td>
+            <td>
+              <%= format_task_duration(jid_history["enqueued_at"], jid_history["finished_at"]) %>
+            </td>
+            <td>
+              <%= build_tag(
+                :span,
+                t(task_status(jid_history).to_s).capitalize,
+                class: "st-status-badge #{task_status(jid_history)}",
+                "data-tooltip": jid_history["error"],
+              ) %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+</div>
 
 <header class="">
   <div class="">
@@ -85,13 +106,15 @@
     <input type="text" id="envConfirmationInput" class="st-input" name="env_confirmation" data-current-env="<%= current_env %>" required/>
   </div>
 
-  <button type="submit" class="st-button" id="submitBtn" disabled> 
+  <button type="submit" class="st-button" id="submitBtn" disabled>
     <%= t("enqueue") %>
   </button>
 </form>
 
 <% if Sidekiq::Tasks::Web::SIDEKIQ_GTE_7_3_0 %>
   <%= script_tag "tasks/js/env_confirmation.js" %>
+  <%= script_tag "tasks/js/tooltips_manager.js" %>
 <% else %>
   <script type="text/javascript" src="<%= root_path %>tasks/js/env_confirmation.js"></script>
+  <script type="text/javascript" src="<%= root_path %>tasks/js/tooltips_manager.js"></script>
 <% end %>

@@ -1,4 +1,5 @@
 require "sidekiq/tasks/web/helpers/application_helper"
+require "sidekiq/tasks/web/helpers/tag_helper"
 require "sidekiq/tasks/web/helpers/task_helper"
 require "sidekiq/tasks/web/helpers/pagination_helper"
 require "sidekiq/tasks/web/search"
@@ -11,6 +12,7 @@ module Sidekiq
       class Extension
         def self.registered(app)
           app.helpers(Sidekiq::Tasks::Web::Helpers::ApplicationHelper)
+          app.helpers(Sidekiq::Tasks::Web::Helpers::TagHelper)
           app.helpers(Sidekiq::Tasks::Web::Helpers::TaskHelper)
           app.helpers(Sidekiq::Tasks::Web::Helpers::PaginationHelper)
 

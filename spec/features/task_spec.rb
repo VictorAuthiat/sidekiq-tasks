@@ -43,6 +43,7 @@ RSpec.describe "Task page", type: :feature do
           "name" => "foo:bar",
           "args" => {"foo" => "bar"},
           "enqueued_at" => Time.now,
+          "executed_at" => Time.now,
         },
       ]
     )
@@ -52,9 +53,8 @@ RSpec.describe "Task page", type: :feature do
     aggregate_failures do
       expect(page).not_to have_content("No history")
       expect(page).to have_content("a1b2c3")
-      expect(page).to have_content("foo")
-      expect(page).to have_content("bar")
-      expect(page).to have_content("Enqueued")
+      expect(page).to have_content(/\{"foo"\s*=>\s*"bar"\}/)
+      expect(page).to have_content("Running")
     end
   end
 
@@ -106,5 +106,27 @@ RSpec.describe "Task page", type: :feature do
       expect(page).not_to have_content("No history")
       expect(page).to have_content({}.to_s)
     end
+  end
+
+  it "displays error message in a tooltip when the task failed" do
+    allow(Sidekiq::Tasks.tasks.find_by!(name: "task_with_args")).to receive(:history).and_return(
+      [
+        {
+          "jid" => "a1b2c3",
+          "name" => "foo:bar",
+          "args" => {"foo" => "bar"},
+          "enqueued_at" => Time.now,
+          "executed_at" => Time.now,
+          "error" => "StandardError: Task failed",
+        },
+      ]
+    )
+
+    visit "/tasks/task_with_args"
+
+    expect(page).to have_css(
+      ".st-status-badge.failure[data-tooltip=\"StandardError: Task failed\"]",
+      text: "Failure"
+    )
   end
 end

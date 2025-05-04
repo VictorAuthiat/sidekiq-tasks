@@ -23,21 +23,8 @@ RSpec.describe Sidekiq::Tasks::Storage do
 
     it "returns the formatted last enqueue at time when present", :aggregate_failures do
       time = Time.new(2025, 1, 1, 12, 0, 0, "+00:00")
-      expect(Sidekiq).to receive(:redis).and_yield(double(hget: time.to_i.to_s))
+      expect(Sidekiq).to receive(:redis).and_yield(double(hget: time.to_f.to_s))
       expect(described_class.new("foo:bar").last_enqueue_at).to eq(time)
-    end
-  end
-
-  describe "#last_execution_at" do
-    it "returns nil when the last execution at key is not found", :aggregate_failures do
-      expect(Sidekiq).to receive(:redis).and_yield(double(hget: nil))
-      expect(described_class.new("foo:bar").last_execution_at).to be_nil
-    end
-
-    it "returns the formatted last execution at time when present", :aggregate_failures do
-      time = Time.new(2025, 1, 1, 12, 0, 0, "+00:00")
-      expect(Sidekiq).to receive(:redis).and_yield(double(hget: time.to_i.to_s))
-      expect(described_class.new("foo:bar").last_execution_at).to eq(time)
     end
   end
 
@@ -52,14 +39,14 @@ RSpec.describe Sidekiq::Tasks::Storage do
         jid: "foo",
         name: "foo",
         args: {"bar" => "baz"},
-        enqueued_at: Time.new(2025, 1, 1, 13, 0, 0, "+00:00").to_i,
+        enqueued_at: Time.new(2025, 1, 1, 13, 0, 0, "+00:00").to_f,
       }
 
       second_task_trace = {
         jid: "bar",
         name: "bar",
         args: {"baz" => "qux"},
-        enqueued_at: Time.new(2025, 1, 1, 12, 0, 0, "+00:00").to_i,
+        enqueued_at: Time.new(2025, 1, 1, 12, 0, 0, "+00:00").to_f,
       }
 
       tasks_history = [first_task_trace, second_task_trace].map { |task_trace| Sidekiq.dump_json(task_trace) }
@@ -102,7 +89,7 @@ RSpec.describe Sidekiq::Tasks::Storage do
             "jid" => "a1b2c3",
             "name" => "foo:bar",
             "args" => {"bar" => "baz"},
-            "enqueued_at" => Time.at(current_time.to_i),
+            "enqueued_at" => Time.at(current_time.to_f),
           },
         ]
       )
@@ -118,7 +105,7 @@ RSpec.describe Sidekiq::Tasks::Storage do
               jid: "jid_#{index}",
               name: "task_#{index}",
               args: {},
-              enqueued_at: current_time.to_i,
+              enqueued_at: current_time.to_f,
             }
           )
 
@@ -132,7 +119,7 @@ RSpec.describe Sidekiq::Tasks::Storage do
     end
   end
 
-  describe "#store" do
+  describe "#store_enqueue" do
     before { clear_redis }
 
     it "stores the task history and last enqueue at time", :aggregate_failures do
@@ -141,14 +128,14 @@ RSpec.describe Sidekiq::Tasks::Storage do
       storage = described_class.new("foo:bar")
       storage.store_enqueue("a1b2c3", {"bar" => "baz"})
 
-      expect(storage.last_enqueue_at).to eq(Time.at(current_time.to_i))
+      expect(storage.last_enqueue_at).to eq(Time.at(current_time.to_f))
       expect(storage.history.size).to eq(1)
       expect(storage.history.first).to eq(
         {
           "jid" => "a1b2c3",
           "name" => "foo:bar",
           "args" => {"bar" => "baz"},
-          "enqueued_at" => Time.at(current_time.to_i),
+          "enqueued_at" => Time.at(current_time.to_f),
         }
       )
     end
@@ -157,43 +144,89 @@ RSpec.describe Sidekiq::Tasks::Storage do
   describe "#store_execution" do
     before { clear_redis }
 
-    it "stores the task history and last execution at time", :aggregate_failures do
-      current_time = Time.now
+    it "stores the task execution time in the history with the given time key", :aggregate_failures do
+      current_time = Time.now.to_f
       expect(Time).to receive(:now).twice.and_return(current_time)
       storage = described_class.new("foo:bar")
       storage.store_enqueue("a1b2c3", {"bar" => "baz"})
 
-      storage.store_execution("a1b2c3")
+      storage.store_execution("a1b2c3", "executed_at")
 
-      expect(storage.last_execution_at.to_s).to eq(current_time.to_s)
       expect(storage.history.size).to eq(1)
       expect(storage.history.first).to eq(
         {
           "jid" => "a1b2c3",
           "name" => "foo:bar",
           "args" => {"bar" => "baz"},
-          "enqueued_at" => Time.at(current_time.to_i),
-          "executed_at" => Time.at(current_time.to_i),
+          "enqueued_at" => Time.at(current_time),
+          "executed_at" => Time.at(current_time),
         }
       )
     end
 
     it "does nothing when the task is not found", :aggregate_failures do
       current_time = Time.now
-      expect(Time).to receive(:now).twice.and_return(current_time)
+      expect(Time).to receive(:now).and_return(current_time)
       storage = described_class.new("foo:bar")
       storage.store_enqueue("a1b2c3", {"bar" => "baz"})
 
-      storage.store_execution("b1b2c3")
+      storage.store_execution("b1b2c3", "executed_at")
 
-      expect(storage.last_execution_at.to_s).to eq(current_time.to_s)
       expect(storage.history.size).to eq(1)
       expect(storage.history.first).to eq(
         {
           "jid" => "a1b2c3",
           "name" => "foo:bar",
           "args" => {"bar" => "baz"},
-          "enqueued_at" => Time.at(current_time.to_i),
+          "enqueued_at" => Time.at(current_time.to_f),
+        }
+      )
+    end
+  end
+
+  describe "#store_execution_error" do
+    before { clear_redis }
+
+    it "stores the error message in the history with the given jid", :aggregate_failures do
+      current_time = Time.now
+      expect(Time).to receive(:now).and_return(current_time)
+      storage = described_class.new("foo:bar")
+      storage.store_enqueue("a1b2c3", {"bar" => "baz"})
+
+      error = StandardError.new("An error occurred")
+      storage.store_execution_error("a1b2c3", error)
+
+      expect(storage.history.size).to eq(1)
+      expect(storage.history.first).to eq(
+        {
+          "jid" => "a1b2c3",
+          "name" => "foo:bar",
+          "args" => {"bar" => "baz"},
+          "enqueued_at" => Time.at(current_time.to_f),
+          "error" => "StandardError: An error occurred",
+        }
+      )
+    end
+
+    it "truncates the error message when it exceeds the maximum length", :aggregate_failures do
+      stub_const("Sidekiq::Tasks::Storage::ERROR_MESSAGE_MAX_LENGTH", 40)
+
+      current_time = Time.now
+      expect(Time).to receive(:now).and_return(current_time)
+      storage = described_class.new("foo:bar")
+      storage.store_enqueue("a1b2c3", {"bar" => "baz"})
+
+      error = StandardError.new("An error occurred: this is an error message")
+      storage.store_execution_error("a1b2c3", error)
+
+      expect(storage.history.size).to eq(1)
+      expect(storage.history.first).to eq(
+        {
+          "jid" => "a1b2c3",
+          "name" => "foo:bar",
+          "args" => {"bar" => "baz"},
+          "enqueued_at" => Time.at(current_time.to_f),
+          "error" => "StandardError: An error occurred: thi...",
         }
       )
     end

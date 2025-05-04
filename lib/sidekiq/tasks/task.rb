@@ -7,7 +7,7 @@ module Sidekiq
       include Sidekiq::Tasks::Validations
 
       def_delegators :metadata, :name, :desc, :file, :args
-      def_delegators :storage, :last_enqueue_at, :last_execution_at, :history
+      def_delegators :storage, :last_enqueue_at, :history
 
       attr_reader :metadata, :strategy
 
@@ -29,9 +29,17 @@ module Sidekiq
       end
 
       def execute(params = {}, jid: nil)
-        strategy.execute_task(name, params)
+        storage.store_execution(jid, "executed_at")
 
-        storage.store_execution(jid)
+        begin
+          strategy.execute_task(name, params)
+        rescue => e
+          storage.store_execution(jid, "finished_at")
+          storage.store_execution_error(jid, e)
+          raise
+        end
+
+        storage.store_execution(jid, "finished_at")
       end
 
       def storage

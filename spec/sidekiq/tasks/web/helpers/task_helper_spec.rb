@@ -35,4 +35,46 @@ RSpec.describe Sidekiq::Tasks::Web::Helpers::TaskHelper do
       expect(described_class.task_url("/sidekiq/", build_task(name: "foo:bar"))).to eq("/sidekiq/tasks/foo-bar")
     end
   end
+
+  describe "#task_status" do
+    it "returns :failure when error is present" do
+      jid_history = {"error" => "Some error"}
+      expect(described_class.task_status(jid_history)).to eq(:failure)
+    end
+
+    it "returns :success when there is no error and finished_at is present" do
+      jid_history = {"finished_at" => Time.now}
+      expect(described_class.task_status(jid_history)).to eq(:success)
+    end
+
+    it "returns :running when there is no error, no finished_at, and executed_at is present" do
+      jid_history = {"executed_at" => Time.now}
+      expect(described_class.task_status(jid_history)).to eq(:running)
+    end
+
+    it "returns :pending when there is no error, no finished_at, and no executed_at" do
+      jid_history = {}
+      expect(described_class.task_status(jid_history)).to eq(:pending)
+    end
+  end
+
+  describe "#format_task_duration" do
+    it "returns '-' when start_time or end_time is nil", :aggregate_failures do
+      expect(described_class.format_task_duration(nil, nil)).to eq("-")
+      expect(described_class.format_task_duration(Time.now, nil)).to eq("-")
+      expect(described_class.format_task_duration(nil, Time.now)).to eq("-")
+    end
+
+    it "returns the duration in seconds when greater than or equal to 1 second", :aggregate_failures do
+      start_time = Time.now
+      end_time = start_time + 2
+      expect(described_class.format_task_duration(start_time, end_time)).to eq("2s")
+    end
+
+    it "returns the duration in milliseconds when less than 1 second", :aggregate_failures do
+      start_time = Time.now
+      end_time = start_time + 0.42
+      expect(described_class.format_task_duration(start_time, end_time)).to eq("420ms")
+    end
+  end
 end

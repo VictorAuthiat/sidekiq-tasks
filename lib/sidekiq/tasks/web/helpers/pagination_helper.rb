@@ -4,6 +4,7 @@ module Sidekiq
       module Helpers
         module PaginationHelper
           extend self
+          include Sidekiq::Tasks::Web::Helpers::TagHelper
 
           def pagination_link(root_path, link, search)
             build_tag(:li, class: "st-page-item") do
@@ -17,18 +18,6 @@ module Sidekiq
           end
 
           private
-
-          def build_tag(tag, content = nil, **attributes, &block)
-            attr_string = attributes.map { |key, value| "#{key}=\"#{value}\"" }.join(" ")
-
-            "<#{tag} #{attr_string}>#{block&.call || content}</#{tag}>"
-          end
-
-          def build_classes(*classes, **conditions)
-            condition_classes = conditions.select { |_, value| value }.keys
-
-            (classes + condition_classes).join(" ")
-          end
 
           def pagination_url(root_path, search, page)
             "#{root_path}tasks?filter=#{ERB::Util.url_encode(search.filter)}&count=#{search.count}&page=#{page}"

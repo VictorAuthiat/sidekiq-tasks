@@ -105,10 +105,24 @@ RSpec.describe Sidekiq::Tasks::Task do
 
     it "stores the execution history with the given jid", :aggregate_failures do
       task = build_task(name: "foo:bar", args: ["foo"])
+
       expect(task.strategy).to receive(:execute_task).with("foo:bar", {foo: "bar"})
-      expect(task.storage).to receive(:store_execution).with("a1b2c3")
+      expect(task.storage).to receive(:store_execution).with("a1b2c3", "executed_at")
+      expect(task.storage).to receive(:store_execution).with("a1b2c3", "finished_at")
 
       task.execute({foo: "bar"}, jid: "a1b2c3")
+    end
+
+    it "stores the error and re-raises the exception when execution fails", :aggregate_failures do
+      task = build_task(name: "foo:bar", args: ["foo"])
+      error = StandardError.new("Something went wrong")
+
+      expect(task.strategy).to receive(:execute_task).with("foo:bar", {foo: "bar"}).and_raise(error)
+      expect(task.storage).to receive(:store_execution).with("a1b2c3", "executed_at")
+      expect(task.storage).to receive(:store_execution_error).with("a1b2c3", error)
+      expect(task.storage).to receive(:store_execution).with("a1b2c3", "finished_at")
+
+      expect { task.execute({foo: "bar"}, jid: "a1b2c3") }.to raise_error(StandardError, "Something went wrong")
     end
   end
 end

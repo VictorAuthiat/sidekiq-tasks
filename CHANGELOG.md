@@ -1,5 +1,9 @@
 ## Changelog
 
+### [Unreleased]
+
+- Add duration, status and error reports to history.
+
 ### [0.1.4] - 2025-03-23
 
 - Fix gem load error by moving the entrypoint to the correct path.

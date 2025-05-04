@@ -1,0 +1,72 @@
+:root {
+  --badge-success-text: #22713d;
+  --badge-success-bg: #dff5e3;
+  --badge-success-border: #b5e2c4;
+
+  --badge-failure-text: #a82a34;
+  --badge-failure-bg: #fbe3e5;
+  --badge-failure-border: #f5b7bc;
+
+  --badge-running-text: #0b5394;
+  --badge-running-bg: #dceeff;
+  --badge-running-border: #a9d4f2;
+
+  --badge-pending-text: #8a6d1d;
+  --badge-pending-bg: #fff8dc;
+  --badge-pending-border: #f5e6ab;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --badge-success-text: #b5e2c4;
+    --badge-success-bg: #1a3b28;
+    --badge-success-border: #2f5b3f;
+
+    --badge-failure-text: #f5b7bc;
+    --badge-failure-bg: #3e1b1d;
+    --badge-failure-border: #7a2e35;
+
+    --badge-running-text: #a9d4f2;
+    --badge-running-bg: #1a2c3e;
+    --badge-running-border: #345c7f;
+
+    --badge-pending-text: #f5e6ab;
+    --badge-pending-bg: #3e351a;
+    --badge-pending-border: #7a6a2e;
+  }
+}
+
+.st-status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: default;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.st-status-badge.success {
+  color: var(--badge-success-text);
+  background-color: var(--badge-success-bg);
+  border-color: var(--badge-success-border);
+}
+
+.st-status-badge.failure {
+  color: var(--badge-failure-text);
+  background-color: var(--badge-failure-bg);
+  border-color: var(--badge-failure-border);
+}
+
+.st-status-badge.running {
+  color: var(--badge-running-text);
+  background-color: var(--badge-running-bg);
+  border-color: var(--badge-running-border);
+}
+
+.st-status-badge.pending {
+  color: var(--badge-pending-text);
+  background-color: var(--badge-pending-bg);
+  border-color: var(--badge-pending-border);
+}

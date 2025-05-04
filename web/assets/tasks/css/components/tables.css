@@ -5,6 +5,8 @@
   --st-table-odd-bg: #fcfcfc;
   --st-table-even-bg: transparent;
   --st-table-header-bg: transparent;
+  --st-table-code-bg: #fcfcfc;
+  --st-table-code-text: #6c6869;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -18,6 +20,10 @@
   }
 }
 
+.st-table-container {
+  overflow: auto;
+}
+
 .st-table {
   background-color: var(--st-table-bg);
   color: var(--st-table-text);
@@ -29,8 +35,13 @@
 .st-table thead > tr > th,
 .st-table tbody > tr > th,
 .st-table tbody > tr > td {
+  max-width: 300px;
+  overflow: scroll;
+  display: table-cell;
+  vertical-align: middle;
   border: 1px solid var(--st-table-border);
   padding: 7px 10px;
+  white-space: nowrap;
 }
 
 .st-table tbody tr:nth-child(odd) {
@@ -46,3 +57,11 @@
   background-color: var(--st-table-header-bg);
 }
 
+.st-table code {
+  background-color: var(--st-table-code-bg);
+  color: var(--st-table-code-text);
+  box-shadow: 0 0 0 1px var(--st-table-border);
+  border-radius: 2px;
+  padding: 0.2em 0.4em;
+  border-radius: 0.2em;
+}

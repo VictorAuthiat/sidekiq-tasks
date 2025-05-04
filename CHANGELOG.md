@@ -1,6 +1,6 @@
 ## Changelog
 
-### [Unreleased]
+### [0.1.5] - 2025-05-04
 
 - Add duration, status and error reports to history.
 - Fix Code Climate report by updating CI runner from `ubuntu-20.04` to `ubuntu-22.04`.

@@ -12,6 +12,7 @@ module Sidekiq
             return false if lines.nil?
 
             return true if task_has_magic_comment?(lines, line_number)
+            return true if desc_has_magic_comment?(task.full_comment, lines, line_number)
 
             namespace_line_index = find_namespace_line_index(lines, task)
             return false unless namespace_line_index
@@ -31,6 +32,17 @@ module Sidekiq
             File.read(file).split("\n")
           rescue Errno::ENOENT
             raise ArgumentError, "File '#{file}' not found"
+          end
+
+          def desc_has_magic_comment?(desc, lines, task_line)
+            return false unless desc&.include?("\n")
+
+            desc_line_index = lines[0...task_line].rindex { |line| line.strip.start_with?("desc") }
+
+            return false unless desc_line_index
+
+            comment_line = lines[desc_line_index - 1]&.strip
+            !!(comment_line =~ magic_comment_regex)
           end
 
           def task_has_magic_comment?(lines, task_line)

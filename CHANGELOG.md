@@ -4,6 +4,7 @@
 
 - Enable CI workflows on all branches. (#4)
 - Add description to task list. (#2)
+- Detect magic comment before multiline desc. (#3)
 
 ### [0.1.5] - 2025-05-04
 

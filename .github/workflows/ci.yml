@@ -69,7 +69,7 @@ jobs:
         run: "bundle exec rubocop"
 
       - name: "Upload artifacts"
-        if: matrix.ruby == '3.4' && matrix.sidekiq == '~> 7' && matrix.rack == '>= 3.1.0'
+        if: matrix.ruby == '3.4' && matrix.sidekiq == '= 7' && matrix.rack == '>= 3.1.0'
         uses: "actions/upload-artifact@v4"
         with:
           name: "coverage-artifacts"

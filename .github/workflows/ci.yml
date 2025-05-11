@@ -14,28 +14,28 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        sidekiq: ['~> 7', '~> 7.3']
+        sidekiq: ['= 7', '= 7.3']
         ruby: ['3.0.0', '3.1', '3.2', '3.3', '3.4']
         rack: ['~> 2.2', '>= 3.1.0']
         include:
           # Sidekiq < 7 is only compatible with Rack ~> 2.0
-          - sidekiq: '~> 6.5'
+          - sidekiq: '= 6.5'
             ruby: '3.2'
             rack: '~> 2.0'
-          - sidekiq: '~> 6.5'
+          - sidekiq: '= 6.5'
             ruby: '3.3'
             rack: '~> 2.0'
-          - sidekiq: '~> 6.5'
+          - sidekiq: '= 6.5'
             ruby: '3.4'
             rack: '~> 2.0'
           # Sidekiq 8 is only compatible with Ruby >= 3.2 and Rack >= 3.1
-          - sidekiq: '~> 8'
+          - sidekiq: '= 8'
             ruby: '3.2'
             rack: '>= 3.1.0'
-          - sidekiq: '~> 8'
+          - sidekiq: '= 8'
             ruby: '3.3'
             rack: '>= 3.1.0'
-          - sidekiq: '~> 8'
+          - sidekiq: '= 8'
             ruby: '3.4'
             rack: '>= 3.1.0'
 
@@ -55,7 +55,9 @@ jobs:
         uses: "ruby/setup-ruby@v1"
         with:
           ruby-version: ${{ matrix.ruby }}
-          bundler-cache: true
+
+      - name: "Install dependencies"
+        run: bundle install
 
       - name: "Setup ChromeDriver"
         uses: "nanasess/setup-chromedriver@v2"

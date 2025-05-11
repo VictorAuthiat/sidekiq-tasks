@@ -6,6 +6,7 @@ fr:
   filter: "Filtrer"
   no_tasks:  "Aucune tâche trouvée"
   name: "Nom"
+  description: "Description"
   last_enqueued: "Dernière mise en file d'attente"
   history: "Historique"
   no_history: "Aucun historique"

@@ -17,7 +17,10 @@ RSpec.describe "Tasks page", type: :feature do
     visit "/tasks"
 
     aggregate_failures do
-      tasks.each { |task| expect(page).to have_content(task.name) }
+      tasks.each do |task|
+        expect(page).to have_content(task.name)
+        expect(page).to have_content(task.desc)
+      end
     end
   end
 

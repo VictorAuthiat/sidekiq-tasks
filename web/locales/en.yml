@@ -6,6 +6,7 @@ en:
   filter: "Filter"
   no_tasks:  "No tasks found"
   name: "Name"
+  description: "Description"
   last_enqueued: "Last enqueued"
   history: "History"
   no_history: "No history"

@@ -1,5 +1,9 @@
 ## Changelog
 
+### [Unreleased]
+
+- Enable CI workflows on all branches. (#4)
+
 ### [0.1.5] - 2025-05-04
 
 - Add duration, status and error reports to history.

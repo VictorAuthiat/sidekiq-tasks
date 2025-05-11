@@ -28,32 +28,34 @@
   </form>
 </header>
 
-<% if @search.tasks.empty? %>
-  <%= t("no_tasks") %>
-<% else %>
-  <table class="st-table">
-    <thead>
-      <tr>
-        <th><%= t("name") %></th>
-        <th><%= t("description") %></th>
-        <th><%= t("last_enqueued") %></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @search.tasks.each do |task| %>
+<div class="st-table-container">
+  <% if @search.tasks.empty? %>
+    <%= t("no_tasks") %>
+  <% else %>
+    <table class="st-table">
+      <thead>
         <tr>
-          <td>
-            <a href="<%= task_url(root_path, task) %>" class="st-text-primary">
-              <b><%= task.name %></b>
-            </a>
-          </td>
-
-          <td><%= task.desc %></td>
-          <td><%= task.last_enqueue_at ? relative_time(task.last_enqueue_at) : "-" %></td>
+          <th><%= t("name") %></th>
+          <th><%= t("description") %></th>
+          <th><%= t("last_enqueued") %></th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <% @search.tasks.each do |task| %>
+          <tr>
+            <td>
+              <a href="<%= task_url(root_path, task) %>" class="st-text-primary">
+                <b><%= task.name %></b>
+              </a>
+            </td>
 
-  <%= erb(read_view(:_pagination), locals: {search: @search}) %>
-<% end %>
+            <td><%= task.desc %></td>
+            <td><%= task.last_enqueue_at ? relative_time(task.last_enqueue_at) : "-" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <%= erb(read_view(:_pagination), locals: {search: @search}) %>
+  <% end %>
+</div>

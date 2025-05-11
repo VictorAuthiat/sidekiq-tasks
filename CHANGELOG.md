@@ -6,6 +6,7 @@
 - Add description to task list. (#2)
 - Detect magic comment before multiline desc. (#3)
 - Fix style tag rendering and plugin registration for Sidekiq Web UI 7.3+ and 8.0+. (#1)
+- Enable horizontal scroll on tasks table for mobile. (#5)
 
 ### [0.1.5] - 2025-05-04
 

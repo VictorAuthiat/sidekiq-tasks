@@ -12,17 +12,26 @@ module Sidekiq
   end
 end
 
-if Sidekiq::Tasks::Web::SIDEKIQ_GTE_7_3_0
+if Sidekiq::Tasks::Web::SIDEKIQ_GTE_8_0_0
   Sidekiq::Web.configure do |config|
     config.register(
       Sidekiq::Tasks::Web::Extension,
       name: "tasks",
-      tab: ["Tasks"],
-      index: ["tasks"],
+      tab: "Tasks",
+      index: "tasks",
       root_dir: Sidekiq::Tasks::Web::ROOT,
       asset_paths: ["js", "css"]
     )
   end
+elsif Sidekiq::Tasks::Web::SIDEKIQ_GTE_7_3_0
+  Sidekiq::Web.register(
+    Sidekiq::Tasks::Web::Extension,
+    name: "tasks",
+    tab: "Tasks",
+    index: "tasks",
+    root_dir: Sidekiq::Tasks::Web::ROOT,
+    asset_paths: ["js", "css"]
+  )
 else
   Sidekiq::Web.tabs["Tasks"] = "tasks"
   Sidekiq::Web.register(Sidekiq::Tasks::Web::Extension)

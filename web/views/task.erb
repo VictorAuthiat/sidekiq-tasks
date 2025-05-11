@@ -1,7 +1,13 @@
-<% if Sidekiq::Tasks::Web::SIDEKIQ_GTE_7_3_0 %>
+<% if Sidekiq::Tasks::Web::SIDEKIQ_GTE_8_0_0 %>
   <% style_tag "tasks/css/ext.css" %>
+<% elsif Sidekiq::Tasks::Web::SIDEKIQ_GTE_7_3_0 %>
+  <% add_to_head do %>
+    <%= style_tag "tasks/css/ext.css" %>
+  <% end %>
 <% else %>
-  <link href="<%= root_path %>tasks/css/ext.css" media="screen" rel="stylesheet" type="text/css"/>
+  <% add_to_head do %>
+    <link href="<%= root_path %>tasks/css/ext.css" media="screen" rel="stylesheet" type="text/css"/>
+  <% end %>
 <% end %>
 
 <header class="st-header">

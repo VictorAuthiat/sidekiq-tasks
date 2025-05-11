@@ -1,6 +1,6 @@
 ## Changelog
 
-### [Unreleased]
+### [0.1.6] - 2025-05-11
 
 - Enable CI workflows on all branches. (#4)
 - Add description to task list. (#2)

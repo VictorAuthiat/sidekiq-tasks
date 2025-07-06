@@ -40,12 +40,15 @@ Sidekiq Tasks is based on the concept of **strategies** and **rules** to manage 
 - A **strategy** defines how tasks are loaded, built, enqueued, and executed.
 - A **rule** is a condition given to a strategy to determine which tasks are available.
 
+## Default strategy
+
 By default, it comes with the `Sidekiq::Tasks::Strategies::RakeTask` strategy, which allows you to enqueue and execute Rake tasks with their arguments.
 
-> [!NOTE]
-> In accordance with the principle of least privilege, it has the following rules:
-> - **`TaskFromLib`** Only tasks from the `lib` folder are loaded.
-> - **`EnableWithComment`** Only tasks explicitly enabled with a magic comment are loaded.
+### Rules
+
+In accordance with the principle of least privilege, it has the following rules:
+  - **`TaskFromLib`** Only tasks from the `lib` folder are loaded.
+  - **`EnableWithComment`** Only tasks explicitly enabled with a magic comment are loaded.
 
 Example of an enabled task in `lib/tasks/my_task.rake`:
 
@@ -80,6 +83,21 @@ task :my_task do
   puts "my_task"
 end
 ```
+
+### Arguments
+
+Task arguments are automatically detected and made available in the form. For example, if you have a task defined like this:
+
+```ruby
+task :my_task, [:arg1, :arg2] => :environment do |_, args|
+  puts "arg1: #{args[:arg1]}, arg2: #{args[:arg2]}"
+end
+```
+
+You will see a form with two input fields for `arg1` and `arg2` when you access the task details page.
+
+> [!IMPORTANT]
+> The arguments are passed as strings, so you may need to convert them to the appropriate type in your task implementation.
 
 ## Strategies configuration
 

@@ -1,5 +1,9 @@
 ## Changelog
 
+### [Unreleased]
+
+- Support multiline description in task view.
+
 ### [0.1.6] - 2025-05-11
 
 - Enable CI workflows on all branches. (#4)

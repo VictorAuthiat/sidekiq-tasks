@@ -65,3 +65,8 @@
   padding: 0.2em 0.4em;
   border-radius: 0.2em;
 }
+
+.st-table .st-desc-cell {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}

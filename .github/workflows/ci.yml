@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: ["**"]
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   tests:
     runs-on: "ubuntu-latest"
@@ -68,29 +72,9 @@ jobs:
       - name: "Run Rubocop"
         run: "bundle exec rubocop"
 
-      - name: "Upload artifacts"
+      - name: "Upload coverage to Qlty"
         if: matrix.ruby == '3.4' && matrix.sidekiq == '= 7' && matrix.rack == '>= 3.1.0'
-        uses: "actions/upload-artifact@v4"
+        uses: qltysh/qlty-action/coverage@v1
         with:
-          name: "coverage-artifacts"
-          path: "${{github.workspace}}/coverage/coverage.json"
-          retention-days: 1
-
-  coverage:
-    name: "Report coverage to Code Climate"
-    runs-on: "ubuntu-22.04"
-    needs: "tests"
-    if: success() && github.ref == 'refs/heads/master'
-    env:
-      CC_TEST_REPORTER_ID: "${{ secrets.CC_TEST_REPORTER_ID }}"
-
-    steps:
-      - uses: "actions/checkout@v4"
-
-      - name: "Download coverage artifacts from test job"
-        uses: "actions/download-artifact@v4"
-        with:
-          name: "coverage-artifacts"
-      - uses: "paambaati/codeclimate-action@v3.2.0"
-        with:
-          coverageLocations: "coverage.json:simplecov"
+          oidc: true
+          files: coverage/.resultset.json

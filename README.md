@@ -1,8 +1,8 @@
 # Sidekiq::Tasks
 
 [![CI Status](https://github.com/victorauthiat/sidekiq-tasks/actions/workflows/ci.yml/badge.svg)](https://github.com/victorauthiat/sidekiq-tasks/actions/workflows/ci.yml)
-[![Maintainability](https://api.codeclimate.com/v1/badges/079e91362a810b4ef80d/maintainability)](https://codeclimate.com/github/VictorAuthiat/sidekiq-tasks/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/079e91362a810b4ef80d/test_coverage)](https://codeclimate.com/github/VictorAuthiat/sidekiq-tasks/test_coverage)
+[![Maintainability](https://qlty.sh/gh/VictorAuthiat/projects/sidekiq-tasks/maintainability.svg)](https://qlty.sh/gh/VictorAuthiat/projects/sidekiq-tasks)
+[![Code Coverage](https://qlty.sh/gh/VictorAuthiat/projects/sidekiq-tasks/coverage.svg)](https://qlty.sh/gh/VictorAuthiat/projects/sidekiq-tasks)
 
 > A [Sidekiq](https://github.com/sidekiq/sidekiq) extension for task management.
 

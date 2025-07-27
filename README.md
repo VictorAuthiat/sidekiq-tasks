@@ -203,6 +203,21 @@ end
 > [!WARNING]
 > Ensure that `enqueue_task` returns the JID of the Sidekiq job that will execute the task.
 
+## Authorization
+
+By default, web interface access is not restricted. You can configure authorization to restrict access to the tasks :
+
+```ruby
+Sidekiq::Tasks.configure do |config|
+  config.authorization = ->(env) do
+    env["warden"].user(:admin_user).super_admin?
+  end
+end
+```
+
+>[!NOTE]
+> The `Tasks` button in the header will still be displayed regardless of the value of `authorization`.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

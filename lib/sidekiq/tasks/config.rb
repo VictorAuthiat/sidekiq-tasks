@@ -17,11 +17,12 @@ module Sidekiq
 
       include Sidekiq::Tasks::Validations
 
-      attr_reader :strategies, :sidekiq_options
+      attr_reader :strategies, :sidekiq_options, :authorization
 
       def initialize
         @sidekiq_options = DEFAULT_SIDEKIQ_OPTIONS
         @strategies = DEFAULT_STRATEGIES
+        @authorization = ->(_env) { true }
       end
 
       # @see https://github.com/sidekiq/sidekiq/wiki/Advanced-Options#jobs
@@ -41,6 +42,12 @@ module Sidekiq
         validate_array_classes!(strategies, [Sidekiq::Tasks::Strategies::Base], "strategies")
 
         @strategies = strategies
+      end
+
+      def authorization=(authorization_proc)
+        validate_class!(authorization_proc, [Proc], "authorization")
+
+        @authorization = authorization_proc
       end
     end
   end

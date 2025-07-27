@@ -20,6 +20,11 @@ RSpec.describe Sidekiq::Tasks::Config do
         ]
       )
     end
+
+    it "sets the default authorization proc" do
+      expect(described_class.new.authorization).to be_a(Proc)
+      expect(described_class.new.authorization.call({})).to eq(true)
+    end
   end
 
   describe "#sidekiq_options=" do
@@ -164,6 +169,25 @@ RSpec.describe Sidekiq::Tasks::Config do
         raise_error(
           Sidekiq::Tasks::ArgumentError,
           "'foo' must be an instance of Sidekiq::Tasks::Strategies::Base but received String"
+        )
+      )
+    end
+  end
+
+  describe "#authorization=" do
+    let(:config) { described_class.new }
+
+    it "sets the authorization proc" do
+      authorization_proc = ->(_env) { true }
+      config.authorization = authorization_proc
+      expect(config.authorization).to eq(authorization_proc)
+    end
+
+    it "raises an error when the authorization is not a Proc" do
+      expect { config.authorization = "foo" }.to(
+        raise_error(
+          Sidekiq::Tasks::ArgumentError,
+          "'authorization' must be an instance of Proc but received String"
         )
       )
     end

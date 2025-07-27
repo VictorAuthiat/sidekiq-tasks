@@ -17,6 +17,15 @@ RSpec.describe "Sidekiq::Tasks::Web", type: :request do
   end
 
   describe "GET /tasks" do
+    it "returns a 403 error when the user is not authorized", :aggregate_failures do
+      allow(Sidekiq::Tasks.config).to receive(:authorization).and_return(->(_env) { false })
+
+      get "/tasks"
+
+      expect(last_response.status).to eq(403)
+      expect(last_response.body).to include("Forbidden")
+    end
+
     it "correctly renders the tasks page when no tasks are found", :aggregate_failures do
       expect(Sidekiq::Tasks.tasks).to(
         receive(:where)
@@ -43,6 +52,15 @@ RSpec.describe "Sidekiq::Tasks::Web", type: :request do
   end
 
   describe "GET /tasks/:name" do
+    it "returns a 403 error when the user is not authorized", :aggregate_failures do
+      allow(Sidekiq::Tasks.config).to receive(:authorization).and_return(->(_env) { false })
+
+      get "/tasks/foo-bar"
+
+      expect(last_response.status).to eq(403)
+      expect(last_response.body).to include("Forbidden")
+    end
+
     it "returns a 404 error when the task is not found", :aggregate_failures do
       expect(Sidekiq::Tasks.tasks).to(
         receive(:find_by!)
@@ -71,6 +89,15 @@ RSpec.describe "Sidekiq::Tasks::Web", type: :request do
 
   describe "POST /tasks/:name/enqueue" do
     before { stub_env("RAILS_ENV", "development") }
+
+    it "returns a 403 error when the user is not authorized", :aggregate_failures do
+      allow(Sidekiq::Tasks.config).to receive(:authorization).and_return(->(_env) { false })
+
+      post "/tasks/foo-bar/enqueue", {"env_confirmation" => "development"}
+
+      expect(last_response.status).to eq(403)
+      expect(last_response.body).to include("Forbidden")
+    end
 
     it "enqueues the task with permitted params and redirects to the task", :aggregate_failures do
       task = build_task(name: "foo:bar", args: ["bar"])

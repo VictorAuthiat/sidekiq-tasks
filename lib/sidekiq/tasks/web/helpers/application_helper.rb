@@ -24,6 +24,12 @@ module Sidekiq
           def fetch_params(*keys)
             keys.to_h { |key| [key.to_sym, fetch_param(key)] }
           end
+
+          def authorize!
+            return if Sidekiq::Tasks.config.authorization.call(env)
+
+            throw :halt, [403, {"Content-Type" => "text/plain"}, ["Forbidden"]]
+          end
         end
       end
     end

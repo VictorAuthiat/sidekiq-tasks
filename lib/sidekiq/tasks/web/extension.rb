@@ -17,12 +17,16 @@ module Sidekiq
           app.helpers(Sidekiq::Tasks::Web::Helpers::PaginationHelper)
 
           app.get "/tasks" do
+            authorize!
+
             @search = Sidekiq::Tasks::Web::Search.new(fetch_params(:count, :page, :filter))
 
             erb(read_view(:tasks), locals: {search: @search})
           end
 
           app.get "/tasks/:name" do
+            authorize!
+
             @task = find_task!(env["rack.route_params"][:name])
 
             erb(read_view(:task), locals: {task: @task})
@@ -31,6 +35,8 @@ module Sidekiq
           end
 
           app.post "/tasks/:name/enqueue" do
+            authorize!
+
             if fetch_param("env_confirmation") != current_env
               throw :halt, [400, {Rack::CONTENT_TYPE => "text/plain"}, ["Invalid confirm"]]
             end

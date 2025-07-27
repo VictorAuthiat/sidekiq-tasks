@@ -3,6 +3,7 @@
 ### [Unreleased]
 
 - Support multiline description in task view.
+- Add authorization support for web interface access.
 
 ### [0.1.6] - 2025-05-11
 

@@ -1,6 +1,6 @@
 ## Changelog
 
-### [Unreleased]
+### [0.1.7] - 2025-07-27
 
 - Support multiline description in task view.
 - Add authorization support for web interface access.

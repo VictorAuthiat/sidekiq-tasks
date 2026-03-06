@@ -69,11 +69,16 @@ RSpec.describe Sidekiq::Tasks::Set do
       )
     end
 
-    it "returns the first object matching the given name", :aggregate_failures do
+    it "returns the object matching the exact name", :aggregate_failures do
+      expect(set.find_by(name: "foo:bar")).to have_attributes(name: "foo:bar")
+      expect(set.find_by(name: "bar:baz")).to have_attributes(name: "bar:baz")
+    end
+
+    it "returns nil when the name does not match exactly", :aggregate_failures do
       expect(set.find_by(name: "toto")).to be_nil
-      expect(set.find_by(name: "foo").name).to eq("foo:bar")
-      expect(set.find_by(name: "bar").name).to eq("foo:bar")
-      expect(set.find_by(name: "baz").name).to eq("bar:baz")
+      expect(set.find_by(name: "foo")).to be_nil
+      expect(set.find_by(name: "bar")).to be_nil
+      expect(set.find_by(name: "baz")).to be_nil
     end
   end
 
@@ -87,14 +92,18 @@ RSpec.describe Sidekiq::Tasks::Set do
       )
     end
 
-    it "returns the first object matching the given name and raises an error if not found", :aggregate_failures do
+    it "returns the object matching the exact name", :aggregate_failures do
+      expect(set.find_by!(name: "foo:bar")).to have_attributes(name: "foo:bar")
+      expect(set.find_by!(name: "bar:baz")).to have_attributes(name: "bar:baz")
+    end
+
+    it "raises an error when the name does not match exactly", :aggregate_failures do
       expect { set.find_by!(name: "toto") }.to(
         raise_error(Sidekiq::Tasks::NotFoundError, "'toto' not found")
       )
-
-      expect(set.find_by!(name: "foo").name).to eq("foo:bar")
-      expect(set.find_by!(name: "bar").name).to eq("foo:bar")
-      expect(set.find_by!(name: "baz").name).to eq("bar:baz")
+      expect { set.find_by!(name: "foo") }.to(
+        raise_error(Sidekiq::Tasks::NotFoundError, "'foo' not found")
+      )
     end
   end
 

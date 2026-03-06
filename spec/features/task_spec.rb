@@ -19,6 +19,11 @@ RSpec.describe "Task page", type: :feature do
     expect(page).to have_content("Task not found")
   end
 
+  it "display error when task name is a partial match" do
+    visit "/tasks/tests"
+    expect(page).to have_content("Task not found")
+  end
+
   it "displays the task details" do
     visit "/tasks/tests-task_with_args"
 
@@ -36,7 +41,7 @@ RSpec.describe "Task page", type: :feature do
   end
 
   it "displays history when exist" do
-    allow(Sidekiq::Tasks.tasks.find_by!(name: "task_with_args")).to receive(:history).and_return(
+    allow(Sidekiq::Tasks.tasks.find_by!(name: "tests:task_with_args")).to receive(:history).and_return(
       [
         {
           "jid" => "a1b2c3",
@@ -48,7 +53,7 @@ RSpec.describe "Task page", type: :feature do
       ]
     )
 
-    visit "/tasks/task_with_args"
+    visit "/tasks/tests-task_with_args"
 
     aggregate_failures do
       expect(page).not_to have_content("No history")
@@ -109,7 +114,7 @@ RSpec.describe "Task page", type: :feature do
   end
 
   it "displays error message in a tooltip when the task failed" do
-    allow(Sidekiq::Tasks.tasks.find_by!(name: "task_with_args")).to receive(:history).and_return(
+    allow(Sidekiq::Tasks.tasks.find_by!(name: "tests:task_with_args")).to receive(:history).and_return(
       [
         {
           "jid" => "a1b2c3",
@@ -122,7 +127,7 @@ RSpec.describe "Task page", type: :feature do
       ]
     )
 
-    visit "/tasks/task_with_args"
+    visit "/tasks/tests-task_with_args"
 
     expect(page).to have_css(
       ".st-status-badge.failure[data-tooltip=\"StandardError: Task failed\"]",

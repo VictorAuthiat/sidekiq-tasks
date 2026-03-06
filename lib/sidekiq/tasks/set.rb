@@ -29,7 +29,7 @@ module Sidekiq
       end
 
       def find_by(name: nil)
-        where(name: name).first
+        objects.find { |object| object.name == name }
       end
 
       def find_by!(name: nil)

@@ -29,7 +29,7 @@ module Sidekiq
       def sidekiq_options=(options)
         validate_class!(options, [Hash], "sidekiq_options")
         validate_hash_option!(options, :queue, [String])
-        validate_hash_option!(options, :retry, [TrueClass, FalseClass])
+        validate_hash_option!(options, :retry, [NilClass, TrueClass, FalseClass, Integer])
         validate_hash_option!(options, :dead, [NilClass, TrueClass, FalseClass])
         validate_hash_option!(options, :backtrace, [NilClass, TrueClass, FalseClass, Integer])
         validate_hash_option!(options, :pool, [NilClass, String])

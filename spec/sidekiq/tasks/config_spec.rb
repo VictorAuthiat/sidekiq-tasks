@@ -69,18 +69,18 @@ RSpec.describe Sidekiq::Tasks::Config do
       )
     end
 
-    it "raises an error when the retry key is invalid", :aggregate_failures do
-      expect { config.sidekiq_options = {queue: "foo", retry: nil} }.to(
-        raise_error(
-          Sidekiq::Tasks::ArgumentError,
-          "'retry' must be an instance of TrueClass or FalseClass but received NilClass"
-        )
-      )
+    it "does not raise an error when the retry key is valid", :aggregate_failures do
+      expect { config.sidekiq_options = {queue: "foo", retry: nil} }.not_to raise_error
+      expect { config.sidekiq_options = {queue: "foo", retry: true} }.not_to raise_error
+      expect { config.sidekiq_options = {queue: "foo", retry: false} }.not_to raise_error
+      expect { config.sidekiq_options = {queue: "foo", retry: 5} }.not_to raise_error
+    end
 
-      expect { config.sidekiq_options = {queue: "foo", retry: 1} }.to(
+    it "raises an error when the retry key is invalid" do
+      expect { config.sidekiq_options = {queue: "foo", retry: "foo"} }.to(
         raise_error(
           Sidekiq::Tasks::ArgumentError,
-          "'retry' must be an instance of TrueClass or FalseClass but received Integer"
+          "'retry' must be an instance of NilClass or TrueClass or FalseClass or Integer but received String"
         )
       )
     end

@@ -4,6 +4,7 @@
 
 - Replace deprecated `webdrivers` gem with `selenium-webdriver`.
 - Avoid duplicate CI runs on pull request branches.
+- Fix `retry` option validation to accept integer values.
 
 ### [0.1.7] - 2025-07-27
 

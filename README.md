@@ -10,6 +10,11 @@ Sidekiq-Tasks extends Sidekiq by providing an interface to enqueue tasks directl
 
 ![Task view](docs/task.png)
 
+## Requirements
+
+- Ruby >= 3.0
+- Sidekiq >= 6.5 (compatible with 6.5, 7.x, and 8.x)
+
 ## Installation
 
 ```bash
@@ -190,6 +195,8 @@ Sidekiq::Tasks.configure do |config|
 end
 ```
 
+All standard [Sidekiq job options](https://github.com/sidekiq/sidekiq/wiki/Advanced-Options#jobs) are supported.
+
 You can also override the `enqueue_task` method to implement your own enqueuing logic for your strategy:
 
 ```ruby
@@ -217,6 +224,14 @@ end
 
 >[!NOTE]
 > The `Tasks` button in the header will still be displayed regardless of the value of `authorization`.
+
+## Execution history
+
+Each task keeps a history of its last 10 executions, stored in Redis. The task detail page displays for each execution:
+
+- The enqueue, start, and finish timestamps
+- The arguments passed
+- The error message if the execution failed
 
 ## Development
 

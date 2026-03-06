@@ -25,6 +25,12 @@ module Sidekiq
             keys.to_h { |key| [key.to_sym, fetch_param(key)] }
           end
 
+          def pollable?
+            return false if current_path.start_with?("tasks")
+
+            super
+          end
+
           def authorize!
             return if Sidekiq::Tasks.config.authorization.call(env)
 

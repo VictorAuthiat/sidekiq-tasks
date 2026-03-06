@@ -12,7 +12,13 @@
 
 <header class="st-header">
   <form action="<%= root_path %>tasks" method="get" class="st-search-form">
-    <input name="filter" class="st-input" type="text" value="<%= @search.filter %>" placeholder="<%= t("search") %>">
+    <input
+      name="filter"
+      class="st-input"
+      type="text"
+      value="<%= Rack::Utils.escape_html(@search.filter.to_s) %>"
+      placeholder="<%= t("search") %>"
+    >
 
     <select name="count" class="st-select">
       <% Sidekiq::Tasks::Web::Search.count_options.each do |count| %>

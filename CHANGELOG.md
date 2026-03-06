@@ -8,6 +8,7 @@
 - Add `retry_for` option support (Sidekiq 7.1.3+).
 - Fix `find_by` to use exact name matching instead of fuzzy matching.
 - Disable live poll on tasks pages to prevent form state loss (Sidekiq >= 7.0.1).
+- Escape filter parameter in tasks view to prevent HTML injection.
 
 ### [0.1.7] - 2025-07-27
 

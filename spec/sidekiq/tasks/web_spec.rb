@@ -38,6 +38,22 @@ RSpec.describe "Sidekiq::Tasks::Web", type: :request do
       expect(last_response.status).to eq(200)
     end
 
+    it "escapes the filter parameter in the HTML output" do
+      xss_payload = '"><svg onload=alert(1)>'
+
+      expect(Sidekiq::Tasks.tasks).to(
+        receive(:where)
+          .with(name: xss_payload)
+          .and_return(build_task_set)
+      )
+
+      get "/tasks", {"filter" => xss_payload}
+
+      expect(last_response.status).to eq(200)
+      expect(last_response.body).not_to include(xss_payload)
+      expect(last_response.body).to include("&quot;&gt;&lt;svg onload=alert(1)&gt;")
+    end
+
     it "correctly renders the tasks page when tasks are found", :aggregate_failures do
       expect(Sidekiq::Tasks.tasks).to(
         receive(:where)

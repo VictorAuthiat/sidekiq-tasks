@@ -63,9 +63,6 @@ jobs:
       - name: "Install dependencies"
         run: bundle install
 
-      - name: "Setup ChromeDriver"
-        uses: "nanasess/setup-chromedriver@v2"
-
       - name: "Run specs"
         run: "CAPYBARA_DRIVER=selenium_chrome_headless bundle exec rspec --format progress"
 

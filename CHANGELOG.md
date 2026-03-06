@@ -6,6 +6,7 @@
 - Avoid duplicate CI runs on pull request branches.
 - Fix `retry` option validation to accept integer values.
 - Add `retry_for` option support (Sidekiq 7.1.3+).
+- Fix `find_by` to use exact name matching instead of fuzzy matching.
 
 ### [0.1.7] - 2025-07-27
 

@@ -6,6 +6,7 @@ module Sidekiq
       autoload :Extension, "sidekiq/tasks/web/extension"
 
       ROOT = File.expand_path("../../../web", File.dirname(__FILE__))
+      SIDEKIQ_GTE_7_0_1 = Gem::Version.new(Sidekiq::VERSION) >= Gem::Version.new("7.0.1")
       SIDEKIQ_GTE_7_3_0 = Gem::Version.new(Sidekiq::VERSION) >= Gem::Version.new("7.3.0")
       SIDEKIQ_GTE_8_0_0 = Gem::Version.new(Sidekiq::VERSION) >= Gem::Version.new("8.0.0")
     end

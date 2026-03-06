@@ -14,6 +14,14 @@ RSpec.describe "Task page", type: :feature do
     )
   end
 
+  it(
+    "does not display the live poll button",
+    skip: !Sidekiq::Tasks::Web::SIDEKIQ_GTE_7_0_1 && "requires Sidekiq >= 7.0.1"
+  ) do
+    visit "/tasks/tests-task_with_args"
+    expect(page).not_to have_css(".live-poll-start", visible: :all)
+  end
+
   it "display error when task not found" do
     visit "/tasks/unknown"
     expect(page).to have_content("Task not found")

@@ -1,5 +1,9 @@
 ## Changelog
 
+### [Unreleased]
+
+- Replace deprecated `webdrivers` gem with `selenium-webdriver`.
+
 ### [0.1.7] - 2025-07-27
 
 - Support multiline description in task view.

@@ -45,9 +45,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "rubocop"
+  spec.add_development_dependency "selenium-webdriver"
   spec.add_development_dependency "sidekiq"
   spec.add_development_dependency "simplecov"
   spec.add_development_dependency "simplecov-json"
-  spec.add_development_dependency "webdrivers"
   spec.add_development_dependency "webrick"
 end

@@ -85,6 +85,21 @@ RSpec.describe Sidekiq::Tasks::Config do
       )
     end
 
+    it "does not raise an error when the retry_for key is valid", :aggregate_failures do
+      expect { config.sidekiq_options = {queue: "foo", retry_for: nil} }.not_to raise_error
+      expect { config.sidekiq_options = {queue: "foo", retry_for: 3600} }.not_to raise_error
+      expect { config.sidekiq_options = {queue: "foo", retry_for: 172_800.0} }.not_to raise_error
+    end
+
+    it "raises an error when the retry_for key is invalid" do
+      expect { config.sidekiq_options = {queue: "foo", retry_for: "foo"} }.to(
+        raise_error(
+          Sidekiq::Tasks::ArgumentError,
+          "'retry_for' must be an instance of NilClass or Integer or Float but received String"
+        )
+      )
+    end
+
     it "raises an error when the dead key is invalid" do
       expect { config.sidekiq_options = {queue: "foo", retry: false, dead: "foo"} }.to(
         raise_error(

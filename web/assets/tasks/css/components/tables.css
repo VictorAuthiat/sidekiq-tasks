@@ -70,3 +70,33 @@
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+
+.st-sortable {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.st-sortable:hover {
+  text-decoration: underline;
+}
+
+.st-sorted-asc::after,
+.st-sorted-desc::after {
+  content: "";
+  display: inline-block;
+  margin-left: 5px;
+  width: 0;
+  height: 0;
+  vertical-align: middle;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+}
+
+.st-sorted-asc::after {
+  border-bottom: 4px solid currentColor;
+}
+
+.st-sorted-desc::after {
+  border-top: 4px solid currentColor;
+}

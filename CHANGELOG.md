@@ -3,6 +3,7 @@
 ### [Unreleased]
 
 - Add configurable `history_limit` option (default: 10).
+- Add sortable columns (`name`, `last_enqueued`) in the tasks list.
 
 ### [0.1.8] - 2026-03-06
 

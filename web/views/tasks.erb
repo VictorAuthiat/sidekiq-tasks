@@ -12,6 +12,9 @@
 
 <header class="st-header">
   <form action="<%= root_path %>tasks" method="get" class="st-search-form">
+    <input type="hidden" name="sort" value="<%= @search.sort %>">
+    <input type="hidden" name="direction" value="<%= @search.direction %>">
+
     <input
       name="filter"
       class="st-input"
@@ -42,9 +45,23 @@
     <table class="st-table">
       <thead>
         <tr>
-          <th><%= t("name") %></th>
+          <th>
+            <a
+              href="<%= sort_header_url(@search, root_path, "name") %>"
+              class="<%= sort_header_classes(@search, "name") %>"
+            >
+              <%= t("name") %>
+            </a>
+          </th>
           <th><%= t("description") %></th>
-          <th><%= t("last_enqueued") %></th>
+          <th>
+            <a
+              href="<%= sort_header_url(@search, root_path, "last_enqueued") %>"
+              class="<%= sort_header_classes(@search, "last_enqueued") %>"
+            >
+              <%= t("last_enqueued") %>
+            </a>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -70,7 +87,7 @@
         total_count: Sidekiq::Tasks.tasks.size,
         page: @search.page,
         total_pages: @search.total_pages,
-        base_url: "#{root_path}tasks?filter=#{ERB::Util.url_encode(@search.filter)}&count=#{@search.count}",
+        base_url: pagination_base_url(@search, root_path),
       }
     ) %>
   <% end %>

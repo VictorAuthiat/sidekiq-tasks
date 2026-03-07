@@ -6,6 +6,17 @@ module Sidekiq
           extend self
           include Sidekiq::Tasks::Web::Helpers::TagHelper
 
+          def pagination_base_url(search, root_path)
+            query_params = {
+              filter: search.filter.to_s,
+              count: search.count,
+              sort: search.sort,
+              direction: search.direction,
+            }
+
+            "#{root_path}tasks?#{URI.encode_www_form(query_params)}"
+          end
+
           def build_pagination_link(link, base_url)
             separator = base_url.include?("?") ? "&" : "?"
 

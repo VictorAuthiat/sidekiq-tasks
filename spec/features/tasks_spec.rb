@@ -102,10 +102,28 @@ RSpec.describe "Tasks page", type: :feature do
     select "4", from: "count"
     click_on "Filter"
 
-    expect(page).to have_current_path("/tasks?filter=&count=4")
+    expect(page).to have_current_path("/tasks?sort=name&direction=asc&filter=&count=4")
 
     aggregate_failures do
       tasks.each { |task| expect(page).to have_content(task.name) }
+    end
+  end
+
+  it "sorts tasks by name descending when clicking the name header" do
+    visit "/tasks?count=2"
+
+    aggregate_failures do
+      expect(page).to have_content("posts:create")
+      expect(page).to have_content("users:create")
+      expect(page).not_to have_content("users:destroy")
+    end
+
+    click_on "Name"
+
+    aggregate_failures do
+      expect(page).to have_content("users:destroy")
+      expect(page).to have_content("users:create")
+      expect(page).not_to have_content("posts:create")
     end
   end
 
@@ -114,7 +132,7 @@ RSpec.describe "Tasks page", type: :feature do
     fill_in "filter", with: "users"
     click_on "Filter"
 
-    expect(page).to have_current_path("/tasks?filter=users&count=15")
+    expect(page).to have_current_path("/tasks?sort=name&direction=asc&filter=users&count=15")
 
     aggregate_failures do
       expect(page).to have_content("users:create")
@@ -124,7 +142,7 @@ RSpec.describe "Tasks page", type: :feature do
 
     fill_in "filter", with: ""
     click_on "Filter"
-    expect(page).to have_current_path("/tasks?filter=&count=15")
+    expect(page).to have_current_path("/tasks?sort=name&direction=asc&filter=&count=15")
 
     aggregate_failures do
       tasks.each { |task| expect(page).to have_content(task.name) }

@@ -1,6 +1,22 @@
 require "spec_helper"
 
 RSpec.describe Sidekiq::Tasks::Web::Helpers::PaginationHelper do
+  describe ".pagination_base_url" do
+    it "generates a base URL with all search params" do
+      search = Sidekiq::Tasks::Web::Search.new({filter: "foo", count: 30, sort: "name", direction: "asc"})
+
+      expect(described_class.pagination_base_url(search, "/sidekiq/")).to eq(
+        "/sidekiq/tasks?filter=foo&count=30&sort=name&direction=asc"
+      )
+    end
+
+    it "encodes the filter parameter" do
+      search = Sidekiq::Tasks::Web::Search.new({filter: "foo bar"})
+
+      expect(described_class.pagination_base_url(search, "/")).to include("filter=foo+bar")
+    end
+  end
+
   describe ".build_pagination_link" do
     it "generates a pagination link" do
       link = {page: 2, text: "2"}

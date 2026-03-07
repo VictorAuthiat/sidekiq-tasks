@@ -2,6 +2,7 @@ require "sidekiq/tasks/web/helpers/application_helper"
 require "sidekiq/tasks/web/helpers/tag_helper"
 require "sidekiq/tasks/web/helpers/task_helper"
 require "sidekiq/tasks/web/helpers/pagination_helper"
+require "sidekiq/tasks/web/helpers/sort_helper"
 require "sidekiq/tasks/web/search"
 require "sidekiq/tasks/web/pagination"
 require "sidekiq/tasks/web/params"
@@ -15,11 +16,12 @@ module Sidekiq
           app.helpers(Sidekiq::Tasks::Web::Helpers::TagHelper)
           app.helpers(Sidekiq::Tasks::Web::Helpers::TaskHelper)
           app.helpers(Sidekiq::Tasks::Web::Helpers::PaginationHelper)
+          app.helpers(Sidekiq::Tasks::Web::Helpers::SortHelper)
 
           app.get "/tasks" do
             authorize!
 
-            @search = Sidekiq::Tasks::Web::Search.new(fetch_params(:count, :page, :filter))
+            @search = Sidekiq::Tasks::Web::Search.new(fetch_params(:count, :page, :filter, :sort, :direction))
 
             erb(read_view(:tasks), locals: {search: @search})
           end

@@ -93,6 +93,44 @@ RSpec.describe Sidekiq::Tasks::Task do
         )
       end
     end
+
+    it "passes user to storage when provided" do
+      current_time = Time.new(2025, 1, 1, 12, 0, 0, "+00:00")
+      allow(Time).to receive(:now).and_return(current_time)
+
+      task = build_task(name: "foo:bar", args: ["foo"])
+      user = {"id" => 1, "email" => "admin@example.com"}
+
+      expect(task.strategy).to(
+        receive(:enqueue_task)
+          .with("foo:bar", {"foo" => "bar"})
+          .and_return("a1b2c3")
+      )
+
+      expect(task.storage).to(
+        receive(:store_enqueue)
+          .with("a1b2c3", {"foo" => "bar"}, user: user)
+      )
+
+      task.enqueue({"foo" => "bar"}, user: user)
+    end
+
+    it "does not include user when not provided" do
+      task = build_task(name: "foo:bar", args: ["foo"])
+
+      expect(task.strategy).to(
+        receive(:enqueue_task)
+          .with("foo:bar", {"foo" => "bar"})
+          .and_return("a1b2c3")
+      )
+
+      expect(task.storage).to(
+        receive(:store_enqueue)
+          .with("a1b2c3", {"foo" => "bar"}, user: nil)
+      )
+
+      task.enqueue({"foo" => "bar"})
+    end
   end
 
   describe "#execute" do

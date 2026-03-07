@@ -50,6 +50,9 @@
       <tr>
         <th><%= t("jid") %></th>
         <th><%= t("args") %></th>
+        <% if Sidekiq::Tasks.config.current_user %>
+          <th><%= t("enqueued_by") %></th>
+        <% end %>
         <th><%= t("enqueued") %></th>
         <th><%= t("executed") %></th>
         <th><%= t("duration") %></th>
@@ -63,6 +66,11 @@
             <td>
               <code><%= jid_history["args"] %></code>
             </td>
+            <% if Sidekiq::Tasks.config.current_user %>
+              <td>
+                <code><%= jid_history["user"] || "-" %></code>
+              </td>
+            <% end %>
             <td>
               <%= jid_history["enqueued_at"] ? jid_history["enqueued_at"].strftime(t("task_time")) : "-" %>
             </td>

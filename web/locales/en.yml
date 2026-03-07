@@ -25,4 +25,5 @@ en:
   running: "Running"
   success: "Success"
   failure: "Failure"
+  enqueued_by: "Enqueued by"
   task_time: "%m/%d/%y %H:%M:%S"

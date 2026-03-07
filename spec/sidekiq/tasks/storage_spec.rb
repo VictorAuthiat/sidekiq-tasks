@@ -95,6 +95,31 @@ RSpec.describe Sidekiq::Tasks::Storage do
       )
     end
 
+    it "stores user when provided" do
+      current_time = Time.now
+      user = {"id" => 1, "email" => "admin@example.com"}
+      storage.store_history("a1b2c3", {"bar" => "baz"}, current_time, user: user)
+
+      expect(storage.history).to eq(
+        [
+          {
+            "jid" => "a1b2c3",
+            "name" => "foo:bar",
+            "args" => {"bar" => "baz"},
+            "enqueued_at" => Time.at(current_time.to_f),
+            "user" => {"id" => 1, "email" => "admin@example.com"},
+          },
+        ]
+      )
+    end
+
+    it "does not include user when nil" do
+      current_time = Time.now
+      storage.store_history("a1b2c3", {"bar" => "baz"}, current_time)
+
+      expect(storage.history.first).not_to have_key("user")
+    end
+
     it "trims the history to the configured history limit", :aggregate_failures do
       current_time = Time.now
 
@@ -136,6 +161,25 @@ RSpec.describe Sidekiq::Tasks::Storage do
           "name" => "foo:bar",
           "args" => {"bar" => "baz"},
           "enqueued_at" => Time.at(current_time.to_f),
+        }
+      )
+    end
+
+    it "stores user in the history when provided", :aggregate_failures do
+      current_time = Time.now
+      expect(Time).to receive(:now).and_return(current_time)
+      user = {"id" => 1, "email" => "admin@example.com"}
+      storage = described_class.new("foo:bar")
+      storage.store_enqueue("a1b2c3", {"bar" => "baz"}, user: user)
+
+      expect(storage.history.size).to eq(1)
+      expect(storage.history.first).to eq(
+        {
+          "jid" => "a1b2c3",
+          "name" => "foo:bar",
+          "args" => {"bar" => "baz"},
+          "enqueued_at" => Time.at(current_time.to_f),
+          "user" => {"id" => 1, "email" => "admin@example.com"},
         }
       )
     end

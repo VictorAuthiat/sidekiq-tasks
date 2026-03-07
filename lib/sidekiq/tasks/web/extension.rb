@@ -61,7 +61,8 @@ module Sidekiq
             task = find_task!(env["rack.route_params"][:name])
             args = Sidekiq::Tasks::Web::Params.new(task, fetch_param("args")).permit!
 
-            task.enqueue(args)
+            current_user = Sidekiq::Tasks.config.current_user&.call(env)
+            task.enqueue(args, user: current_user)
 
             redirect(task_url(root_path, task))
           rescue Sidekiq::Tasks::ArgumentError => e

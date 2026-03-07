@@ -233,6 +233,14 @@ Each task keeps a history of its last 10 executions, stored in Redis. The task d
 - The arguments passed
 - The error message if the execution failed
 
+You can configure the history limit:
+
+```ruby
+Sidekiq::Tasks.configure do |config|
+  config.history_limit = 25
+end
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

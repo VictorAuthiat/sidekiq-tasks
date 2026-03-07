@@ -1,14 +1,14 @@
-<% if search.total_pages > 1 %>
+<% if total_pages > 1 %>
   <div class="st-pagination-wrapper">
     <div>
       <small class="st-text-primary">
-        <%= search.tasks.size %> / <%= Sidekiq::Tasks.tasks.size %>
+        <%= displayed_count %> / <%= total_count %>
       </small>
     </div>
 
     <ul class="st-pagination">
-      <% Sidekiq::Tasks::Web::Pagination.new(search.page, search.total_pages).links.each do |link| %>
-        <%= pagination_link(root_path, link, search) %>
+      <% Sidekiq::Tasks::Web::Pagination.new(page, total_pages).links.each do |link| %>
+        <%= build_pagination_link(link, base_url) %>
       <% end %>
     </ul>
   </div>

@@ -121,6 +121,61 @@ RSpec.describe "Task page", type: :feature do
     end
   end
 
+  it "paginates history when exceeding per page limit" do
+    history_entries = 12.times.map do |index|
+      {
+        "jid" => "jid_#{index}",
+        "name" => "foo:bar",
+        "args" => {},
+        "enqueued_at" => Time.now,
+        "executed_at" => Time.now,
+        "finished_at" => Time.now,
+      }
+    end
+
+    allow(Sidekiq::Tasks.tasks.find_by!(name: "tests:task_with_args")).to receive(:history).and_return(history_entries)
+
+    visit "/tasks/tests-task_with_args"
+
+    aggregate_failures do
+      expect(page).to have_content("jid_0")
+      expect(page).to have_content("jid_9")
+      expect(page).not_to have_content("jid_10")
+      expect(page).to have_content("10 / 12")
+      expect(page).to have_content("»")
+    end
+
+    click_on "»"
+
+    aggregate_failures do
+      expect(page).to have_content("jid_10")
+      expect(page).to have_content("jid_11")
+      expect(page).not_to have_content("jid_0")
+      expect(page).to have_content("2 / 12")
+      expect(page).to have_content("«")
+    end
+  end
+
+  it "does not show history pagination when there is only one page" do
+    history_entries = 3.times.map do |index|
+      {
+        "jid" => "jid_#{index}",
+        "name" => "foo:bar",
+        "args" => {},
+        "enqueued_at" => Time.now,
+      }
+    end
+
+    allow(Sidekiq::Tasks.tasks.find_by!(name: "tests:task_with_args")).to receive(:history).and_return(history_entries)
+
+    visit "/tasks/tests-task_with_args"
+
+    aggregate_failures do
+      expect(page).to have_content("jid_0")
+      expect(page).not_to have_css(".st-pagination")
+    end
+  end
+
   it "displays error message in a tooltip when the task failed" do
     allow(Sidekiq::Tasks.tasks.find_by!(name: "tests:task_with_args")).to receive(:history).and_return(
       [

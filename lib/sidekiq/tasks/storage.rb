@@ -2,7 +2,6 @@ module Sidekiq
   module Tasks
     class Storage
       JID_PREFIX = "task".freeze
-      HISTORY_LIMIT = 10
       ERROR_MESSAGE_MAX_LENGTH = 255
 
       attr_reader :task_name
@@ -30,7 +29,7 @@ module Sidekiq
 
         raw_entries.map do |raw|
           entry = Sidekiq.load_json(raw)
-          %w[enqueued_at executed_at finished_at].each do |key|
+          ["enqueued_at", "executed_at", "finished_at"].each do |key|
             entry[key] = Time.at(entry[key]) if entry[key]
           end
           entry
@@ -41,7 +40,7 @@ module Sidekiq
         Sidekiq.redis do |conn|
           task_trace = {jid: jid, name: task_name, args: task_args, enqueued_at: time.to_f}
           conn.lpush(history_key, Sidekiq.dump_json(task_trace))
-          conn.ltrim(history_key, 0, HISTORY_LIMIT - 1)
+          conn.ltrim(history_key, 0, Sidekiq::Tasks.config.history_limit - 1)
         end
       end
 

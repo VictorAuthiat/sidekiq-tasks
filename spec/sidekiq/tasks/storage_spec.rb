@@ -74,7 +74,7 @@ RSpec.describe Sidekiq::Tasks::Storage do
   describe "#store_history" do
     before do
       clear_redis
-      stub_const("Sidekiq::Tasks::Storage::HISTORY_LIMIT", 3)
+      allow(Sidekiq::Tasks.config).to receive(:history_limit).and_return(3)
     end
 
     let(:storage) { described_class.new("foo:bar") }
@@ -95,11 +95,11 @@ RSpec.describe Sidekiq::Tasks::Storage do
       )
     end
 
-    it "trims the history to HISTORY_LIMIT entries", :aggregate_failures do
+    it "trims the history to the configured history limit", :aggregate_failures do
       current_time = Time.now
 
       Sidekiq.redis do |conn|
-        Sidekiq::Tasks::Storage::HISTORY_LIMIT.times do |index|
+        Sidekiq::Tasks.config.history_limit.times do |index|
           task_trace = Sidekiq.dump_json(
             {
               jid: "jid_#{index}",
@@ -114,8 +114,8 @@ RSpec.describe Sidekiq::Tasks::Storage do
       end
 
       storage.store_history("a1b2c3", {"bar" => "baz"}, current_time)
-      expect(storage.history.size).to eq(Sidekiq::Tasks::Storage::HISTORY_LIMIT)
-      expect(storage.history.map { |task_trace| task_trace["jid"] }).to eq(%w[a1b2c3 jid_2 jid_1])
+      expect(storage.history.size).to eq(Sidekiq::Tasks.config.history_limit)
+      expect(storage.history.map { |task_trace| task_trace["jid"] }).to eq(["a1b2c3", "jid_2", "jid_1"])
     end
   end
 

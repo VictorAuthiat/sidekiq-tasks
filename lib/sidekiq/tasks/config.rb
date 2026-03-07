@@ -15,14 +15,17 @@ module Sidekiq
         ),
       ].freeze
 
+      DEFAULT_HISTORY_LIMIT = 10
+
       include Sidekiq::Tasks::Validations
 
-      attr_reader :strategies, :sidekiq_options, :authorization
+      attr_reader :strategies, :sidekiq_options, :authorization, :history_limit
 
       def initialize
         @sidekiq_options = DEFAULT_SIDEKIQ_OPTIONS
         @strategies = DEFAULT_STRATEGIES
         @authorization = ->(_env) { true }
+        @history_limit = DEFAULT_HISTORY_LIMIT
       end
 
       # @see https://github.com/sidekiq/sidekiq/wiki/Advanced-Options#jobs
@@ -43,6 +46,14 @@ module Sidekiq
         validate_array_classes!(strategies, [Sidekiq::Tasks::Strategies::Base], "strategies")
 
         @strategies = strategies
+      end
+
+      def history_limit=(limit)
+        validate_class!(limit, [Integer], "history_limit")
+
+        raise Sidekiq::Tasks::ArgumentError, "'history_limit' must be greater than 0" if limit <= 0
+
+        @history_limit = limit
       end
 
       def authorization=(authorization_proc)

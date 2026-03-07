@@ -118,7 +118,7 @@ RSpec.describe "Sidekiq::Tasks::Web", type: :request do
     it "enqueues the task with permitted params and redirects to the task", :aggregate_failures do
       task = build_task(name: "foo:bar", args: ["bar"])
       expect(Sidekiq::Tasks.tasks).to receive(:find_by!).twice.and_return(task) # twice because of redirect
-      expect(task).to receive(:enqueue).with({"bar" => "baz"})
+      expect(task).to receive(:enqueue).with({"bar" => "baz"}, user: nil)
 
       post "/tasks/foo-bar/enqueue", {"name" => "foo", "args" => {"bar" => "baz"}, "env_confirmation" => "development"}
 
@@ -148,6 +148,31 @@ RSpec.describe "Sidekiq::Tasks::Web", type: :request do
 
       expect(last_response.status).to eq(404)
       expect(last_response.body).to include("Task not found")
+    end
+
+    it "passes current_user when current_user is configured", :aggregate_failures do
+      current_user_result = {"id" => 1, "email" => "admin@example.com"}
+      allow(Sidekiq::Tasks.config).to receive(:current_user).and_return(->(_env) { current_user_result })
+
+      task = build_task(name: "foo:bar", args: ["bar"])
+      expect(Sidekiq::Tasks.tasks).to receive(:find_by!).at_least(:once).and_return(task)
+      expect(task).to receive(:enqueue).with({"bar" => "baz"}, user: current_user_result)
+
+      post "/tasks/foo-bar/enqueue", {"name" => "foo", "args" => {"bar" => "baz"}, "env_confirmation" => "development"}
+
+      expect(last_response).to be_redirect
+    end
+
+    it "passes current_user as nil when current_user is not configured", :aggregate_failures do
+      allow(Sidekiq::Tasks.config).to receive(:current_user).and_return(nil)
+
+      task = build_task(name: "foo:bar", args: ["bar"])
+      expect(Sidekiq::Tasks.tasks).to receive(:find_by!).at_least(:once).and_return(task)
+      expect(task).to receive(:enqueue).with({"bar" => "baz"}, user: nil)
+
+      post "/tasks/foo-bar/enqueue", {"name" => "foo", "args" => {"bar" => "baz"}, "env_confirmation" => "development"}
+
+      expect(last_response).to be_redirect
     end
 
     it "returns a 400 error and does not enqueue the task when the params are invalid", :aggregate_failures do

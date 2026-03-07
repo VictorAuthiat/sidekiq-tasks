@@ -36,18 +36,19 @@ module Sidekiq
         end
       end
 
-      def store_history(jid, task_args, time)
+      def store_history(jid, task_args, time, user: nil)
         Sidekiq.redis do |conn|
           task_trace = {jid: jid, name: task_name, args: task_args, enqueued_at: time.to_f}
+          task_trace[:user] = user if user
           conn.lpush(history_key, Sidekiq.dump_json(task_trace))
           conn.ltrim(history_key, 0, Sidekiq::Tasks.config.history_limit - 1)
         end
       end
 
-      def store_enqueue(jid, args)
+      def store_enqueue(jid, args, user: nil)
         time = Time.now.to_f
         store_time(time, "last_enqueue_at")
-        store_history(jid, args, time)
+        store_history(jid, args, time, user: user)
       end
 
       def store_execution(jid, time_key)

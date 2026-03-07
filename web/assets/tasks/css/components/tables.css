@@ -22,6 +22,7 @@
 
 .st-table-container {
   overflow: auto;
+  max-width: 100%;
 }
 
 .st-table {
@@ -64,6 +65,9 @@
   border-radius: 2px;
   padding: 0.2em 0.4em;
   border-radius: 0.2em;
+  display: block;
+  max-width: 200px;
+  overflow: auto;
 }
 
 .st-table .st-desc-cell {

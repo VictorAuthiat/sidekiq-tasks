@@ -2,6 +2,7 @@
 
 ### [Unreleased]
 
+- Add configurable `current_user` option to track who enqueued each task.
 - Add configurable `history_limit` option (default: 10).
 - Add sortable columns (`name`, `last_enqueued`) in the tasks list.
 

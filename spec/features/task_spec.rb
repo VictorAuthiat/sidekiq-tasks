@@ -95,6 +95,7 @@ RSpec.describe "Task page", type: :feature do
     visit "/tasks/tests-task_with_args"
     fill_in "env_confirmation", with: "development"
     fill_in "name", with: "Foo"
+    expect(page).to have_button("Enqueue", disabled: false)
     click_button("Enqueue")
     expect(page).to have_current_path("/tasks/tests-task_with_args")
 
@@ -112,6 +113,7 @@ RSpec.describe "Task page", type: :feature do
 
     visit "/tasks/tests-task_without_args"
     fill_in "env_confirmation", with: "development"
+    expect(page).to have_button("Enqueue", disabled: false)
     click_button("Enqueue")
     expect(page).to have_current_path("/tasks/tests-task_without_args")
 
@@ -174,6 +176,85 @@ RSpec.describe "Task page", type: :feature do
       expect(page).to have_content("jid_0")
       expect(page).not_to have_css(".st-pagination")
     end
+  end
+
+  it "displays the 'Enqueued by' column with user info when current_user is configured", :aggregate_failures do
+    allow(Sidekiq::Tasks.config).to receive(:current_user).and_return(
+      ->(_env) { {"id" => 1, "email" => "admin@example.com"} }
+    )
+
+    allow(Sidekiq::Tasks.tasks.find_by!(name: "tests:task_with_args")).to receive(:history).and_return(
+      [
+        {
+          "jid" => "a1b2c3",
+          "name" => "foo:bar",
+          "args" => {"foo" => "bar"},
+          "enqueued_at" => Time.now,
+          "user" => {"id" => 1, "email" => "admin@example.com"},
+        },
+      ]
+    )
+
+    visit "/tasks/tests-task_with_args"
+
+    expect(page).to have_content("Enqueued by")
+    expect(page).to have_content("admin@example.com")
+  end
+
+  it "displays '-' for old entries without user when current_user is configured", :aggregate_failures do
+    allow(Sidekiq::Tasks.config).to receive(:current_user).and_return(
+      ->(_env) { {"id" => 1, "email" => "admin@example.com"} }
+    )
+
+    allow(Sidekiq::Tasks.tasks.find_by!(name: "tests:task_with_args")).to receive(:history).and_return(
+      [
+        {
+          "jid" => "a1b2c3",
+          "name" => "foo:bar",
+          "args" => {},
+          "enqueued_at" => Time.now,
+        },
+      ]
+    )
+
+    visit "/tasks/tests-task_with_args"
+
+    expect(page).to have_content("Enqueued by")
+    expect(page).to have_css("code", text: "-")
+  end
+
+  it "stores and displays user after enqueuing when current_user is configured", :aggregate_failures do
+    clear_redis
+
+    allow(Sidekiq::Tasks.config).to receive(:current_user).and_return(
+      ->(_env) { {"id" => 1, "email" => "admin@example.com"} }
+    )
+
+    visit "/tasks/tests-task_with_args"
+    fill_in "env_confirmation", with: "development"
+    fill_in "name", with: "Foo"
+    expect(page).to have_button("Enqueue", disabled: false)
+    click_button("Enqueue")
+
+    expect(page).to have_content("Enqueued by")
+    expect(page).to have_content("admin@example.com")
+  end
+
+  it "does not display the 'Enqueued by' column when current_user is not configured" do
+    allow(Sidekiq::Tasks.tasks.find_by!(name: "tests:task_with_args")).to receive(:history).and_return(
+      [
+        {
+          "jid" => "a1b2c3",
+          "name" => "foo:bar",
+          "args" => {"foo" => "bar"},
+          "enqueued_at" => Time.now,
+        },
+      ]
+    )
+
+    visit "/tasks/tests-task_with_args"
+
+    expect(page).not_to have_content("Enqueued by")
   end
 
   it "displays error message in a tooltip when the task failed" do

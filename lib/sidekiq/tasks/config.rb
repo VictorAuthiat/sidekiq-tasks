@@ -19,13 +19,14 @@ module Sidekiq
 
       include Sidekiq::Tasks::Validations
 
-      attr_reader :strategies, :sidekiq_options, :authorization, :history_limit
+      attr_reader :strategies, :sidekiq_options, :authorization, :history_limit, :current_user
 
       def initialize
         @sidekiq_options = DEFAULT_SIDEKIQ_OPTIONS
         @strategies = DEFAULT_STRATEGIES
         @authorization = ->(_env) { true }
         @history_limit = DEFAULT_HISTORY_LIMIT
+        @current_user = nil
       end
 
       # @see https://github.com/sidekiq/sidekiq/wiki/Advanced-Options#jobs
@@ -60,6 +61,12 @@ module Sidekiq
         validate_class!(authorization_proc, [Proc], "authorization")
 
         @authorization = authorization_proc
+      end
+
+      def current_user=(current_user_proc)
+        validate_class!(current_user_proc, [Proc], "current_user")
+
+        @current_user = current_user_proc
       end
     end
   end

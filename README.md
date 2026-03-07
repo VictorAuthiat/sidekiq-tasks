@@ -241,6 +241,22 @@ Sidekiq::Tasks.configure do |config|
 end
 ```
 
+## Current user
+
+You can configure a `current_user` proc to track who enqueued each task.
+The proc receives the Rack `env` and should return a Hash identifying the user:
+
+```ruby
+Sidekiq::Tasks.configure do |config|
+  config.current_user = ->(env) do
+    user = env["warden"].user(:admin_user)
+    {id: user.id, email: user.email}
+  end
+end
+```
+
+When configured, an "Enqueued by" column appears in the task history table.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

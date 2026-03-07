@@ -22,10 +22,10 @@ module Sidekiq
         validate_class!(strategy, [Sidekiq::Tasks::Strategies::Base], "strategy")
       end
 
-      def enqueue(params = {})
+      def enqueue(params = {}, user: nil)
         jid = strategy.enqueue_task(name, params)
 
-        storage.store_enqueue(jid, params)
+        storage.store_enqueue(jid, params, user: user)
       end
 
       def execute(params = {}, jid: nil)

@@ -28,9 +28,9 @@ RSpec.describe Sidekiq::Tasks::Config do
   end
 
   describe "#sidekiq_options=" do
-    let(:config) { described_class.new }
-
     it "sets the sidekiq options" do
+      config = described_class.new
+
       sidekiq_options = {
         queue: "foo",
         retry: true,
@@ -45,7 +45,7 @@ RSpec.describe Sidekiq::Tasks::Config do
     end
 
     it "raises an error when the sidekiq options are not a Hash" do
-      expect { config.sidekiq_options = "foo" }.to(
+      expect { described_class.new.sidekiq_options = "foo" }.to(
         raise_error(
           Sidekiq::Tasks::ArgumentError,
           "'sidekiq_options' must be an instance of Hash but received String"
@@ -54,14 +54,14 @@ RSpec.describe Sidekiq::Tasks::Config do
     end
 
     it "raises an error when the queue key is invalid", :aggregate_failures do
-      expect { config.sidekiq_options = {queue: nil, retry: true} }.to(
+      expect { described_class.new.sidekiq_options = {queue: nil, retry: true} }.to(
         raise_error(
           Sidekiq::Tasks::ArgumentError,
           "'queue' must be an instance of String but received NilClass"
         )
       )
 
-      expect { config.sidekiq_options = {queue: :foo, retry: true} }.to(
+      expect { described_class.new.sidekiq_options = {queue: :foo, retry: true} }.to(
         raise_error(
           Sidekiq::Tasks::ArgumentError,
           "'queue' must be an instance of String but received Symbol"
@@ -70,14 +70,14 @@ RSpec.describe Sidekiq::Tasks::Config do
     end
 
     it "does not raise an error when the retry key is valid", :aggregate_failures do
-      expect { config.sidekiq_options = {queue: "foo", retry: nil} }.not_to raise_error
-      expect { config.sidekiq_options = {queue: "foo", retry: true} }.not_to raise_error
-      expect { config.sidekiq_options = {queue: "foo", retry: false} }.not_to raise_error
-      expect { config.sidekiq_options = {queue: "foo", retry: 5} }.not_to raise_error
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: nil} }.not_to raise_error
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: true} }.not_to raise_error
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: false} }.not_to raise_error
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: 5} }.not_to raise_error
     end
 
     it "raises an error when the retry key is invalid" do
-      expect { config.sidekiq_options = {queue: "foo", retry: "foo"} }.to(
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: "foo"} }.to(
         raise_error(
           Sidekiq::Tasks::ArgumentError,
           "'retry' must be an instance of NilClass or TrueClass or FalseClass or Integer but received String"
@@ -86,13 +86,13 @@ RSpec.describe Sidekiq::Tasks::Config do
     end
 
     it "does not raise an error when the retry_for key is valid", :aggregate_failures do
-      expect { config.sidekiq_options = {queue: "foo", retry_for: nil} }.not_to raise_error
-      expect { config.sidekiq_options = {queue: "foo", retry_for: 3600} }.not_to raise_error
-      expect { config.sidekiq_options = {queue: "foo", retry_for: 172_800.0} }.not_to raise_error
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry_for: nil} }.not_to raise_error
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry_for: 3600} }.not_to raise_error
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry_for: 172_800.0} }.not_to raise_error
     end
 
     it "raises an error when the retry_for key is invalid" do
-      expect { config.sidekiq_options = {queue: "foo", retry_for: "foo"} }.to(
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry_for: "foo"} }.to(
         raise_error(
           Sidekiq::Tasks::ArgumentError,
           "'retry_for' must be an instance of NilClass or Integer or Float but received String"
@@ -101,7 +101,7 @@ RSpec.describe Sidekiq::Tasks::Config do
     end
 
     it "raises an error when the dead key is invalid" do
-      expect { config.sidekiq_options = {queue: "foo", retry: false, dead: "foo"} }.to(
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: false, dead: "foo"} }.to(
         raise_error(
           Sidekiq::Tasks::ArgumentError,
           "'dead' must be an instance of NilClass or TrueClass or FalseClass but received String"
@@ -110,13 +110,13 @@ RSpec.describe Sidekiq::Tasks::Config do
     end
 
     it "does not raise an error when the dead key is nil", :aggregate_failures do
-      expect { config.sidekiq_options = {queue: "foo", retry: false, dead: nil} }.not_to raise_error
-      expect { config.sidekiq_options = {queue: "foo", retry: false, dead: false} }.not_to raise_error
-      expect { config.sidekiq_options = {queue: "foo", retry: false, dead: true} }.not_to raise_error
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: false, dead: nil} }.not_to raise_error
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: false, dead: false} }.not_to raise_error
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: false, dead: true} }.not_to raise_error
     end
 
     it "raises an error when the backtrace key is invalid" do
-      expect { config.sidekiq_options = {queue: "foo", retry: false, backtrace: "foo"} }.to(
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: false, backtrace: "foo"} }.to(
         raise_error(
           Sidekiq::Tasks::ArgumentError,
           "'backtrace' must be an instance of NilClass or TrueClass or FalseClass or Integer but received String"
@@ -125,14 +125,14 @@ RSpec.describe Sidekiq::Tasks::Config do
     end
 
     it "does not raise an error when the backtrace key is nil", :aggregate_failures do
-      expect { config.sidekiq_options = {queue: "foo", retry: false, backtrace: nil} }.not_to raise_error
-      expect { config.sidekiq_options = {queue: "foo", retry: false, backtrace: false} }.not_to raise_error
-      expect { config.sidekiq_options = {queue: "foo", retry: false, backtrace: true} }.not_to raise_error
-      expect { config.sidekiq_options = {queue: "foo", retry: false, backtrace: 0} }.not_to raise_error
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: false, backtrace: nil} }.not_to raise_error
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: false, backtrace: false} }.not_to raise_error
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: false, backtrace: true} }.not_to raise_error
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: false, backtrace: 0} }.not_to raise_error
     end
 
     it "raises an error when the pool key is invalid" do
-      expect { config.sidekiq_options = {queue: "foo", retry: false, pool: 1} }.to(
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: false, pool: 1} }.to(
         raise_error(
           Sidekiq::Tasks::ArgumentError,
           "'pool' must be an instance of NilClass or String but received Integer"
@@ -141,12 +141,12 @@ RSpec.describe Sidekiq::Tasks::Config do
     end
 
     it "does not raise an error when the pool key is nil", :aggregate_failures do
-      expect { config.sidekiq_options = {queue: "foo", retry: false, pool: nil} }.not_to raise_error
-      expect { config.sidekiq_options = {queue: "foo", retry: false, pool: "default"} }.not_to raise_error
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: false, pool: nil} }.not_to raise_error
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: false, pool: "default"} }.not_to raise_error
     end
 
     it "raises an error when the tags key is invalid" do
-      expect { config.sidekiq_options = {queue: "foo", retry: false, tags: 1} }.to(
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: false, tags: 1} }.to(
         raise_error(
           Sidekiq::Tasks::ArgumentError,
           "'tags' must be an instance of NilClass or Array but received Integer"
@@ -155,23 +155,22 @@ RSpec.describe Sidekiq::Tasks::Config do
     end
 
     it "does not raise an error when the tags key is nil", :aggregate_failures do
-      expect { config.sidekiq_options = {queue: "foo", retry: false, tags: nil} }.not_to raise_error
-      expect { config.sidekiq_options = {queue: "foo", retry: false, tags: []} }.not_to raise_error
-      expect { config.sidekiq_options = {queue: "foo", retry: false, tags: ["foo"]} }.not_to raise_error
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: false, tags: nil} }.not_to raise_error
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: false, tags: []} }.not_to raise_error
+      expect { described_class.new.sidekiq_options = {queue: "foo", retry: false, tags: ["foo"]} }.not_to raise_error
     end
   end
 
   describe "#strategies=" do
-    let(:config) { described_class.new }
-
     it "sets the strategies" do
+      config = described_class.new
       strategies = [Sidekiq::Tasks::Strategies::RakeTask.new]
       config.strategies = strategies
       expect(config.strategies).to eq(strategies)
     end
 
     it "raises an error when the strategies are not an array" do
-      expect { config.strategies = "foo" }.to(
+      expect { described_class.new.strategies = "foo" }.to(
         raise_error(
           Sidekiq::Tasks::ArgumentError,
           "'strategies' must be an instance of Array but received String"
@@ -180,7 +179,7 @@ RSpec.describe Sidekiq::Tasks::Config do
     end
 
     it "raises an error when the strategies are not instances of Sidekiq::Tasks::Strategies::Base" do
-      expect { config.strategies = ["foo"] }.to(
+      expect { described_class.new.strategies = ["foo"] }.to(
         raise_error(
           Sidekiq::Tasks::ArgumentError,
           "'foo' must be an instance of Sidekiq::Tasks::Strategies::Base but received String"
@@ -220,17 +219,38 @@ RSpec.describe Sidekiq::Tasks::Config do
     end
   end
 
-  describe "#authorization=" do
-    let(:config) { described_class.new }
+  describe "#current_user=" do
+    it "defaults to nil" do
+      expect(described_class.new.current_user).to be_nil
+    end
 
+    it "sets the current_user proc" do
+      config = described_class.new
+      current_user_proc = ->(_env) { {id: 1, email: "admin@example.com"} }
+      config.current_user = current_user_proc
+      expect(config.current_user).to eq(current_user_proc)
+    end
+
+    it "raises an error when not a Proc" do
+      expect { described_class.new.current_user = "foo" }.to(
+        raise_error(
+          Sidekiq::Tasks::ArgumentError,
+          "'current_user' must be an instance of Proc but received String"
+        )
+      )
+    end
+  end
+
+  describe "#authorization=" do
     it "sets the authorization proc" do
+      config = described_class.new
       authorization_proc = ->(_env) { true }
       config.authorization = authorization_proc
       expect(config.authorization).to eq(authorization_proc)
     end
 
     it "raises an error when the authorization is not a Proc" do
-      expect { config.authorization = "foo" }.to(
+      expect { described_class.new.authorization = "foo" }.to(
         raise_error(
           Sidekiq::Tasks::ArgumentError,
           "'authorization' must be an instance of Proc but received String"

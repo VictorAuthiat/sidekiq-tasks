@@ -1,5 +1,9 @@
 ## Changelog
 
+### [Unreleased]
+
+- Add configurable `history_limit` option (default: 10).
+
 ### [0.1.8] - 2026-03-06
 
 - Replace deprecated `webdrivers` gem with `selenium-webdriver`.

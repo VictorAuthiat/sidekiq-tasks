@@ -6,7 +6,7 @@
   <% end %>
 <% else %>
   <% add_to_head do %>
-    <link href="<%= root_path %>tasks/css/ext.css" media="screen" rel="stylesheet" type="text/css"/>
+    <link href="<%= root_path %>tasks/css/ext.css" media="screen" rel="stylesheet" type="text/css">
   <% end %>
 <% end %>
 
@@ -18,6 +18,7 @@
       type="text"
       value="<%= Rack::Utils.escape_html(@search.filter.to_s) %>"
       placeholder="<%= t("search") %>"
+      autocomplete="off"
     >
 
     <select name="count" class="st-select">
@@ -62,6 +63,15 @@
       </tbody>
     </table>
 
-    <%= erb(read_view(:_pagination), locals: {search: @search}) %>
+    <%= erb(
+      read_view(:_pagination),
+      locals: {
+        displayed_count: @search.tasks.size,
+        total_count: Sidekiq::Tasks.tasks.size,
+        page: @search.page,
+        total_pages: @search.total_pages,
+        base_url: "#{root_path}tasks?filter=#{ERB::Util.url_encode(@search.filter)}&count=#{@search.count}",
+      }
+    ) %>
   <% end %>
 </div>

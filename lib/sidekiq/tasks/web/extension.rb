@@ -29,7 +29,22 @@ module Sidekiq
 
             @task = find_task!(env["rack.route_params"][:name])
 
-            erb(read_view(:task), locals: {task: @task})
+            history = @task.history
+            per_page = 10
+            page = [fetch_param("page").to_i, 1].max
+            total_pages = [(history.size.to_f / per_page).ceil, 1].max
+            history_entries = history.slice((page - 1) * per_page, per_page) || []
+
+            erb(
+              read_view(:task),
+              locals: {
+                task: @task,
+                history_entries: history_entries,
+                history_page: page,
+                history_total_pages: total_pages,
+                history_total_count: history.size,
+              }
+            )
           rescue Sidekiq::Tasks::NotFoundError
             throw :halt, [404, {Rack::CONTENT_TYPE => "text/plain"}, ["Task not found"]]
           end

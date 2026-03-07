@@ -189,6 +189,37 @@ RSpec.describe Sidekiq::Tasks::Config do
     end
   end
 
+  describe "#history_limit=" do
+    it "defaults to 10" do
+      expect(described_class.new.history_limit).to eq(10)
+    end
+
+    it "sets the history limit" do
+      config = described_class.new
+      config.history_limit = 25
+      expect(config.history_limit).to eq(25)
+    end
+
+    it "raises an error when the history limit is not an Integer" do
+      expect { described_class.new.history_limit = "10" }.to(
+        raise_error(
+          Sidekiq::Tasks::ArgumentError,
+          "'history_limit' must be an instance of Integer but received String"
+        )
+      )
+    end
+
+    it "raises an error when the history limit is less than or equal to 0", :aggregate_failures do
+      expect { described_class.new.history_limit = 0 }.to(
+        raise_error(Sidekiq::Tasks::ArgumentError, "'history_limit' must be greater than 0")
+      )
+
+      expect { described_class.new.history_limit = -1 }.to(
+        raise_error(Sidekiq::Tasks::ArgumentError, "'history_limit' must be greater than 0")
+      )
+    end
+  end
+
   describe "#authorization=" do
     let(:config) { described_class.new }
 

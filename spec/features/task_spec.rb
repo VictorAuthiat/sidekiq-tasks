@@ -53,7 +53,7 @@ RSpec.describe "Task page", type: :feature do
       [
         {
           "jid" => "a1b2c3",
-          "name" => "foo:bar",
+          "task_name" => "foo:bar",
           "args" => {"foo" => "bar"},
           "enqueued_at" => Time.now,
           "executed_at" => Time.now,
@@ -187,7 +187,7 @@ RSpec.describe "Task page", type: :feature do
       [
         {
           "jid" => "a1b2c3",
-          "name" => "foo:bar",
+          "task_name" => "foo:bar",
           "args" => {"foo" => "bar"},
           "enqueued_at" => Time.now,
           "user" => {"id" => 1, "email" => "admin@example.com"},
@@ -210,7 +210,7 @@ RSpec.describe "Task page", type: :feature do
       [
         {
           "jid" => "a1b2c3",
-          "name" => "foo:bar",
+          "task_name" => "foo:bar",
           "args" => {},
           "enqueued_at" => Time.now,
         },
@@ -245,7 +245,7 @@ RSpec.describe "Task page", type: :feature do
       [
         {
           "jid" => "a1b2c3",
-          "name" => "foo:bar",
+          "task_name" => "foo:bar",
           "args" => {"foo" => "bar"},
           "enqueued_at" => Time.now,
         },
@@ -262,7 +262,7 @@ RSpec.describe "Task page", type: :feature do
       [
         {
           "jid" => "a1b2c3",
-          "name" => "foo:bar",
+          "task_name" => "foo:bar",
           "args" => {"foo" => "bar"},
           "enqueued_at" => Time.now,
           "executed_at" => Time.now,

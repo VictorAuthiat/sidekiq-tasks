@@ -21,6 +21,10 @@ RSpec.describe Sidekiq::Tasks::Config do
       )
     end
 
+    it "sets the default storage" do
+      expect(described_class.new.storage).to eq(Sidekiq::Tasks::Storage::Redis)
+    end
+
     it "sets the default authorization proc" do
       expect(described_class.new.authorization).to be_a(Proc)
       expect(described_class.new.authorization.call({})).to eq(true)
@@ -183,6 +187,33 @@ RSpec.describe Sidekiq::Tasks::Config do
         raise_error(
           Sidekiq::Tasks::ArgumentError,
           "'foo' must be an instance of Sidekiq::Tasks::Strategies::Base but received String"
+        )
+      )
+    end
+  end
+
+  describe "#storage=" do
+    it "sets the storage class" do
+      config = described_class.new
+      custom_storage = Class.new(Sidekiq::Tasks::Storage::Base)
+      config.storage = custom_storage
+      expect(config.storage).to eq(custom_storage)
+    end
+
+    it "raises an error when the storage is not a class inheriting from Storage::Base" do
+      expect { described_class.new.storage = "foo" }.to(
+        raise_error(
+          Sidekiq::Tasks::ArgumentError,
+          "'storage' must be a class inheriting from Sidekiq::Tasks::Storage::Base but received \"foo\""
+        )
+      )
+    end
+
+    it "raises an error when the storage is a class not inheriting from Storage::Base" do
+      expect { described_class.new.storage = String }.to(
+        raise_error(
+          Sidekiq::Tasks::ArgumentError,
+          "'storage' must be a class inheriting from Sidekiq::Tasks::Storage::Base but received String"
         )
       )
     end

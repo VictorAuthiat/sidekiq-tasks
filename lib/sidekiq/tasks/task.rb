@@ -33,7 +33,7 @@ module Sidekiq
 
         begin
           strategy.execute_task(name, params)
-        rescue => e
+        rescue StandardError, SystemExit => e
           storage.store_execution(jid, "finished_at")
           storage.store_execution_error(jid, e)
           raise
@@ -43,7 +43,7 @@ module Sidekiq
       end
 
       def storage
-        @_storage ||= Sidekiq::Tasks::Storage.new(name)
+        @_storage ||= Sidekiq::Tasks.config.storage.new(name, history_limit: Sidekiq::Tasks.config.history_limit)
       end
     end
   end

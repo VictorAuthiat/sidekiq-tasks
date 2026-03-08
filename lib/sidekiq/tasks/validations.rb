@@ -32,6 +32,14 @@ module Sidekiq
               "'#{name}' must be one of #{expected_values.map(&:inspect).join(" or ")} but received #{value.inspect}"
       end
       module_function :validate_expected_values!
+
+      def validate_subclass!(klass, base_class, name = nil)
+        return if klass.is_a?(Class) && klass <= base_class
+
+        raise Sidekiq::Tasks::ArgumentError,
+              "'#{name}' must be a class inheriting from #{base_class.name} but received #{klass.inspect}"
+      end
+      module_function :validate_subclass!
     end
   end
 end

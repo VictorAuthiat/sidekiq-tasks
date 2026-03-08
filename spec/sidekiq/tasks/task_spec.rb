@@ -26,10 +26,11 @@ RSpec.describe Sidekiq::Tasks::Task do
   end
 
   describe "#storage" do
-    it "returns a memoized instance of Sidekiq::Tasks::Storage" do
+    it "returns a memoized instance of the configured storage" do
       task = build_task(name: "foo:bar", args: ["bar"])
       storage = task.storage
-      expect(storage).to be_a(Sidekiq::Tasks::Storage)
+      expect(storage).to be_a(Sidekiq::Tasks::Storage::Base)
+      expect(storage).to be_a(Sidekiq::Tasks.config.storage)
       expect(storage.object_id).to eq(task.storage.object_id)
     end
   end
@@ -51,7 +52,7 @@ RSpec.describe Sidekiq::Tasks::Task do
       storage_history = [
         {
           "jid" => "a1b2c3",
-          "name" => "foo:bar",
+          "task_name" => "foo:bar",
           "args" => {"bar" => "baz"},
           "enqueued_at" => "2025-01-01 12:00:00 +0000",
         },
@@ -86,9 +87,9 @@ RSpec.describe Sidekiq::Tasks::Task do
         expect(task.history.first).to eq(
           {
             "jid" => "a1b2c3",
-            "name" => "foo:bar",
+            "task_name" => "foo:bar",
             "args" => {"foo" => "bar"},
-            "enqueued_at" => Time.at(current_time.to_i),
+            "enqueued_at" => Time.at(current_time.to_f),
           }
         )
       end
@@ -161,6 +162,18 @@ RSpec.describe Sidekiq::Tasks::Task do
       expect(task.storage).to receive(:store_execution).with("a1b2c3", "finished_at")
 
       expect { task.execute({foo: "bar"}, jid: "a1b2c3") }.to raise_error(StandardError, "Something went wrong")
+    end
+
+    it "stores the error and re-raises when the task calls abort or exit", :aggregate_failures do
+      task = build_task(name: "foo:bar", args: ["foo"])
+      error = SystemExit.new
+
+      expect(task.strategy).to receive(:execute_task).with("foo:bar", {foo: "bar"}).and_raise(error)
+      expect(task.storage).to receive(:store_execution).with("a1b2c3", "executed_at")
+      expect(task.storage).to receive(:store_execution_error).with("a1b2c3", error)
+      expect(task.storage).to receive(:store_execution).with("a1b2c3", "finished_at")
+
+      expect { task.execute({foo: "bar"}, jid: "a1b2c3") }.to raise_error(SystemExit)
     end
   end
 end

@@ -1,0 +1,95 @@
+# Custom Storage Guide
+
+This guide walks you through implementing a custom storage backend using ActiveRecord in a Rails application.
+
+## Step 1: Generate the model and run the migration
+
+```bash
+rails generate model TaskExecution \
+  task_name:string:index \
+  jid:string:index \
+  args:jsonb \
+  enqueued_at:datetime \
+  executed_at:datetime \
+  finished_at:datetime \
+  error:string \
+  user:jsonb
+
+rails db:migrate
+```
+
+## Step 2: Configure the initializer
+
+In `config/initializers/sidekiq_tasks.rb`:
+
+```ruby
+class ActiveRecordStorage < Sidekiq::Tasks::Storage::Base
+  def last_enqueue_at
+    TaskExecution.where(task_name: task_name).order(enqueued_at: :desc).pick(:enqueued_at)
+  end
+
+  def history
+    TaskExecution
+      .where(task_name: task_name)
+      .order(enqueued_at: :desc)
+      .limit(history_limit)
+      .select(:jid, :task_name, :args, :enqueued_at, :executed_at, :finished_at, :error, :user)
+      .map(&:attributes)
+  end
+
+  def store_enqueue(jid, args, user: nil)
+    TaskExecution.create!(
+      task_name: task_name,
+      jid: jid,
+      args: args,
+      enqueued_at: Time.now,
+      user: user
+    )
+  end
+
+  def store_execution(jid, time_key)
+    TaskExecution.find_by(jid: jid)&.update!(time_key => Time.now)
+  end
+
+  def store_execution_error(jid, error)
+    message = truncate_message("#{error.class}: #{error.message}", ERROR_MESSAGE_MAX_LENGTH)
+    TaskExecution.find_by(jid: jid)&.update!(error: message)
+  end
+end
+
+Sidekiq::Tasks.configure do |config|
+  config.storage = ActiveRecordStorage
+end
+```
+
+> [!NOTE]
+> The `history_limit` config is passed to each storage instance. The default Redis storage uses it to trim old entries. Custom storage implementations receive it via the `history_limit` accessor and can use it as needed (e.g. as a SQL `LIMIT`) or ignore it entirely.
+
+## History entry format
+
+The `history` method must return an array of hashes with the following keys:
+
+| Key             | Type          | Description                          |
+|-----------------|---------------|--------------------------------------|
+| `"jid"`         | String        | The Sidekiq job ID                   |
+| `"task_name"`   | String        | The task name                        |
+| `"args"`        | Hash          | The arguments passed to the task     |
+| `"enqueued_at"` | Time          | When the task was enqueued           |
+| `"executed_at"` | Time \| nil   | When the task started executing      |
+| `"finished_at"` | Time \| nil   | When the task finished executing     |
+| `"error"`       | String \| nil | Error message if execution failed    |
+| `"user"`        | Hash \| nil   | User who enqueued the task           |
+
+## Migrating from Redis
+
+After switching to a custom storage, you can clean up the old Redis history:
+
+```bash
+redis-cli --scan --pattern "task:*" | xargs redis-cli del
+```
+
+Or from a Rails console:
+
+```ruby
+Sidekiq.redis { |conn| conn.keys("task:*").each { |key| conn.del(key) } }
+```

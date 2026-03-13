@@ -227,7 +227,7 @@ end
 
 ## Execution history
 
-Each task keeps a history of its last 10 executions, stored in Redis. The task detail page displays for each execution:
+Each task keeps a history of its last executions (default: 10, stored in Redis). The task detail page displays for each execution:
 
 - The enqueue, start, and finish timestamps
 - The arguments passed
@@ -240,6 +240,8 @@ Sidekiq::Tasks.configure do |config|
   config.history_limit = 25
 end
 ```
+
+You can also use a custom storage backend. See the [Custom Storage Guide](docs/custom_storage.md) for more details.
 
 ## Current user
 

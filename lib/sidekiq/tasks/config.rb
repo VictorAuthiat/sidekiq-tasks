@@ -15,15 +15,18 @@ module Sidekiq
         ),
       ].freeze
 
+      DEFAULT_STORAGE = Sidekiq::Tasks::Storage::Redis
+
       DEFAULT_HISTORY_LIMIT = 10
 
       include Sidekiq::Tasks::Validations
 
-      attr_reader :strategies, :sidekiq_options, :authorization, :history_limit, :current_user
+      attr_reader :strategies, :sidekiq_options, :authorization, :history_limit, :current_user, :storage
 
       def initialize
         @sidekiq_options = DEFAULT_SIDEKIQ_OPTIONS
         @strategies = DEFAULT_STRATEGIES
+        @storage = DEFAULT_STORAGE
         @authorization = ->(_env) { true }
         @history_limit = DEFAULT_HISTORY_LIMIT
         @current_user = nil
@@ -47,6 +50,12 @@ module Sidekiq
         validate_array_classes!(strategies, [Sidekiq::Tasks::Strategies::Base], "strategies")
 
         @strategies = strategies
+      end
+
+      def storage=(storage_class)
+        validate_subclass!(storage_class, Sidekiq::Tasks::Storage::Base, "storage")
+
+        @storage = storage_class
       end
 
       def history_limit=(limit)

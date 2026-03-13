@@ -82,4 +82,29 @@ RSpec.describe Sidekiq::Tasks::Validations do
       expect { described_class.validate_hash_option!({foo: "bar"}, :foo, [String]) }.not_to raise_error
     end
   end
+
+  describe "#validate_subclass!" do
+    it "raises an error when the given value is not a class" do
+      expect { described_class.validate_subclass!("foo", Sidekiq::Tasks::Storage::Base, "storage") }.to raise_error(
+        Sidekiq::Tasks::ArgumentError,
+        "'storage' must be a class inheriting from Sidekiq::Tasks::Storage::Base but received \"foo\""
+      )
+    end
+
+    it "raises an error when the given class does not inherit from the base class" do
+      expect { described_class.validate_subclass!(String, Sidekiq::Tasks::Storage::Base, "storage") }.to raise_error(
+        Sidekiq::Tasks::ArgumentError,
+        "'storage' must be a class inheriting from Sidekiq::Tasks::Storage::Base but received String"
+      )
+    end
+
+    it "does not raise an error when the given class inherits from the base class" do
+      expect { described_class.validate_subclass!(Sidekiq::Tasks::Storage::Redis, Sidekiq::Tasks::Storage::Base, "storage") }.not_to raise_error
+    end
+
+    it "does not raise an error for an anonymous subclass" do
+      custom_storage = Class.new(Sidekiq::Tasks::Storage::Base)
+      expect { described_class.validate_subclass!(custom_storage, Sidekiq::Tasks::Storage::Base, "storage") }.not_to raise_error
+    end
+  end
 end

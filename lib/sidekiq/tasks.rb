@@ -3,6 +3,7 @@
 require "rake"
 
 require_relative "tasks/errors"
+require_relative "tasks/storage"
 require_relative "tasks/strategies"
 require_relative "tasks/validations"
 require_relative "tasks/version"
@@ -12,7 +13,6 @@ module Sidekiq
     autoload :Config, "sidekiq/tasks/config"
     autoload :Job, "sidekiq/tasks/job"
     autoload :Set, "sidekiq/tasks/set"
-    autoload :Storage, "sidekiq/tasks/storage"
     autoload :Task, "sidekiq/tasks/task"
     autoload :TaskMetadata, "sidekiq/tasks/task_metadata"
 

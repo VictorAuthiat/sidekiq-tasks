@@ -1,6 +1,6 @@
 ## Changelog
 
-### [Unreleased]
+### [1.0.0] - 2026-03-13
 
 - Add configurable `storage` option with support for custom backends (default: Redis).
 - Add configurable `current_user` option to track who enqueued each task.

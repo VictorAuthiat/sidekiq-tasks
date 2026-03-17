@@ -35,9 +35,9 @@ module Sidekiq
           end
 
           def desc_has_magic_comment?(desc, lines, task_line)
-            return false unless desc&.include?("\n")
+            return false unless desc
 
-            desc_line_index = lines[0...task_line].rindex { |line| line.strip.start_with?("desc") }
+            desc_line_index = lines[0...task_line].rindex { |line| line.strip.match?(/^desc\b/) }
 
             return false unless desc_line_index
 

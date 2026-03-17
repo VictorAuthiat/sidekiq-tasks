@@ -1,5 +1,9 @@
 ## Changelog
 
+### [Unreleased]
+
+- Fix magic comment detection for tasks with multiline descriptions (heredoc, multiline strings, backslash continuation).
+
 ### [1.0.0] - 2026-03-13
 
 - Add configurable `storage` option with support for custom backends (default: Redis).

@@ -1,5 +1,9 @@
 ## Changelog
 
+### [Unreleased]
+
+- Search tasks by description in addition to name.
+
 ### [1.0.1] - 2026-03-17
 
 - Fix magic comment detection for tasks with multiline descriptions (heredoc, multiline strings, backslash continuation).

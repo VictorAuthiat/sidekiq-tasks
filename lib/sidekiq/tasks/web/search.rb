@@ -21,7 +21,7 @@ module Sidekiq
         end
 
         def filtered_collection
-          @_filtered_collection ||= Sidekiq::Tasks.tasks.where(name: filter)
+          @_filtered_collection ||= Sidekiq::Tasks.tasks.where(name: filter, desc: filter)
         end
 
         def filter

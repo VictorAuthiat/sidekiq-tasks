@@ -127,6 +127,18 @@ RSpec.describe "Tasks page", type: :feature do
     end
   end
 
+  it "filters the tasks list by description" do
+    visit "/tasks"
+    fill_in "filter", with: "Create"
+    click_on "Filter"
+
+    aggregate_failures do
+      expect(page).to have_content("posts:create")
+      expect(page).to have_content("users:create")
+      expect(page).not_to have_content("users:destroy")
+    end
+  end
+
   it "filters the tasks list when a filter is provided, and shows all tasks when cleared" do
     visit "/tasks"
     fill_in "filter", with: "users"

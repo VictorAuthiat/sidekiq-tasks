@@ -29,7 +29,7 @@ RSpec.describe "Sidekiq::Tasks::Web", type: :request do
     it "correctly renders the tasks page when no tasks are found", :aggregate_failures do
       expect(Sidekiq::Tasks.tasks).to(
         receive(:where)
-          .with(name: nil)
+          .with(name: nil, desc: nil)
           .and_return(build_task_set)
       )
 
@@ -43,7 +43,7 @@ RSpec.describe "Sidekiq::Tasks::Web", type: :request do
 
       expect(Sidekiq::Tasks.tasks).to(
         receive(:where)
-          .with(name: xss_payload)
+          .with(name: xss_payload, desc: xss_payload)
           .and_return(build_task_set)
       )
 
@@ -57,7 +57,7 @@ RSpec.describe "Sidekiq::Tasks::Web", type: :request do
     it "correctly renders the tasks page when tasks are found", :aggregate_failures do
       expect(Sidekiq::Tasks.tasks).to(
         receive(:where)
-          .with(name: nil)
+          .with(name: nil, desc: nil)
           .and_return(build_task_set(build_task(name: "foo:bar")))
       )
 

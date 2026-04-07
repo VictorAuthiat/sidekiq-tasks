@@ -56,9 +56,9 @@ RSpec.describe Sidekiq::Tasks::Web::Search do
 
     let(:search) { described_class.new({filter: "my_task"}) }
 
-    it "filters tasks based on the name" do
+    it "filters tasks based on the name and description" do
       collection = [build_task(name: "my_task")]
-      expect(Sidekiq::Tasks).to receive_message_chain(:tasks, :where).with(name: "my_task").and_return(collection)
+      expect(Sidekiq::Tasks).to receive_message_chain(:tasks, :where).with(name: "my_task", desc: "my_task").and_return(collection)
       expect(filtered_collection).to eq(collection)
     end
   end

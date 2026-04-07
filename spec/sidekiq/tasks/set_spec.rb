@@ -57,6 +57,12 @@ RSpec.describe Sidekiq::Tasks::Set do
       expect(set.where(file: "foo.rb").map(&:name)).to eq(["foo:bar"])
       expect(set.where(file: "bar.rb").map(&:name)).to eq(["bar:baz"])
     end
+
+    it "filters by description when name does not match" do
+      tasks = described_class.new([build_task(name: "my_task", desc: "Create AdminUser")])
+
+      expect(tasks.where(name: "admin", desc: "admin").map(&:name)).to eq(["my_task"])
+    end
   end
 
   describe "#find_by" do

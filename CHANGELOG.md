@@ -1,6 +1,6 @@
 ## Changelog
 
-### [Unreleased]
+### [1.1.0] - 2026-04-08
 
 - Search tasks by description in addition to name.
 

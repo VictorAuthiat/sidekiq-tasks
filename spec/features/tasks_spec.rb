@@ -9,7 +9,8 @@ RSpec.describe "Tasks page", type: :feature do
     build_task_set(
       build_task(name: "posts:create", desc: "Create post", args: ["title"]),
       build_task(name: "users:create", desc: "Create user", args: ["name"]),
-      build_task(name: "users:destroy", desc: "Destroy users")
+      build_task(name: "users:destroy", desc: "Destroy users"),
+      build_task(name: "reports:generate", desc: "Weekly analytics export")
     )
   end
 
@@ -59,9 +60,9 @@ RSpec.describe "Tasks page", type: :feature do
 
     aggregate_failures do
       expect(page).to have_content("posts:create")
-      expect(page).to have_content("users:create")
+      expect(page).to have_content("reports:generate")
       expect(page).not_to have_content("users:destroy")
-      expect(page).to have_content("2 / 3")
+      expect(page).to have_content("2 / 4")
       expect(page).to have_content("«")
       expect(page).to have_content("»")
     end
@@ -71,17 +72,17 @@ RSpec.describe "Tasks page", type: :feature do
 
     aggregate_failures do
       expect(page).to have_content("users:destroy")
-      expect(page).to have_content("1 / 3")
+      expect(page).to have_content("2 / 4")
       expect(page).to have_content("«")
       expect(page).to have_content("»")
     end
   end
 
   it "does not show pagination when there's only one page" do
-    visit "/tasks?count=3"
+    visit "/tasks?count=4"
 
     aggregate_failures do
-      expect(page).not_to have_content("3 / 3")
+      expect(page).not_to have_content("4 / 4")
       expect(page).not_to have_content("«")
       expect(page).not_to have_content("»")
     end
@@ -93,9 +94,9 @@ RSpec.describe "Tasks page", type: :feature do
     visit "/tasks"
 
     aggregate_failures do
-      expect(page).to have_content("2 / 3")
+      expect(page).to have_content("2 / 4")
       expect(page).to have_content("posts:create")
-      expect(page).to have_content("users:create")
+      expect(page).to have_content("reports:generate")
       expect(page).not_to have_content("users:destroy")
     end
 
@@ -114,7 +115,7 @@ RSpec.describe "Tasks page", type: :feature do
 
     aggregate_failures do
       expect(page).to have_content("posts:create")
-      expect(page).to have_content("users:create")
+      expect(page).to have_content("reports:generate")
       expect(page).not_to have_content("users:destroy")
     end
 
@@ -124,6 +125,19 @@ RSpec.describe "Tasks page", type: :feature do
       expect(page).to have_content("users:destroy")
       expect(page).to have_content("users:create")
       expect(page).not_to have_content("posts:create")
+    end
+  end
+
+  it "filters the tasks list by description" do
+    visit "/tasks"
+    fill_in "filter", with: "analytics"
+    click_on "Filter"
+
+    aggregate_failures do
+      expect(page).to have_content("reports:generate")
+      expect(page).not_to have_content("posts:create")
+      expect(page).not_to have_content("users:create")
+      expect(page).not_to have_content("users:destroy")
     end
   end
 

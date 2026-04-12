@@ -5,15 +5,15 @@ require_relative "lib/sidekiq/tasks/version"
 Gem::Specification.new do |spec|
   spec.name = "sidekiq-tasks"
   spec.version = Sidekiq::Tasks::VERSION
-  spec.authors = ["Victor"]
-  spec.email = ["authiatv@gmail.com"]
+  spec.authors = ["Capsens"]
+  spec.email = ["contact@capsens.eu"]
   spec.summary = "Sidekiq extension for launching tasks."
   spec.description = <<~DESC
     Sidekiq Tasks is an extension for Sidekiq that provides an interface for launching tasks.
     Natively supports rake tasks and can be easily extended to support other task execution systems.
   DESC
 
-  spec.homepage = "https://github.com/victorauthiat/sidekiq-tasks"
+  spec.homepage = "https://github.com/CapSens/sidekiq-tasks"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0"
 

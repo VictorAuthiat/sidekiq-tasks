@@ -1,5 +1,9 @@
 ## Changelog
 
+### [1.1.1] - 2026-04-12
+
+- Transfer repository ownership to Capsens organization.
+
 ### [1.1.0] - 2026-04-08
 
 - Search tasks by description in addition to name.

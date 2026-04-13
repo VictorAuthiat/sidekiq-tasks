@@ -121,8 +121,9 @@ RSpec.describe "Tasks page", type: :feature do
 
     click_on "Name"
 
+    expect(page).to have_content("users:destroy")
+
     aggregate_failures do
-      expect(page).to have_content("users:destroy")
       expect(page).to have_content("users:create")
       expect(page).not_to have_content("posts:create")
     end
@@ -132,6 +133,8 @@ RSpec.describe "Tasks page", type: :feature do
     visit "/tasks"
     fill_in "filter", with: "analytics"
     click_on "Filter"
+
+    expect(page).to have_current_path("/tasks?sort=name&direction=asc&filter=analytics&count=15")
 
     aggregate_failures do
       expect(page).to have_content("reports:generate")

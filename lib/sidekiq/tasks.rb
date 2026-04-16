@@ -3,9 +3,11 @@
 require "rake"
 
 require_relative "tasks/errors"
+require_relative "tasks/validations"
+require_relative "tasks/sidekiq_options_validator"
+require_relative "tasks/magic_comments"
 require_relative "tasks/storage"
 require_relative "tasks/strategies"
-require_relative "tasks/validations"
 require_relative "tasks/version"
 
 module Sidekiq

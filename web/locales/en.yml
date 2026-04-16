@@ -27,3 +27,6 @@ en:
   failure: "Failure"
   enqueued_by: "Enqueued by"
   task_time: "%m/%d/%y %H:%M:%S"
+  options: "Options"
+  task_broken_title: "This task cannot be executed"
+  task_broken_message: "One of its magic comments is invalid:"

@@ -32,6 +32,22 @@ RSpec.describe Sidekiq::Tasks::Strategies::Base do
       expect(Sidekiq::Tasks::Job).to receive(:perform_async).with(name, params.to_json).and_return("a1b2c3")
       expect(described_class.new.enqueue_task(name, params)).to eq("a1b2c3")
     end
+
+    it "applies per-task sidekiq_options through Sidekiq::Job.set when present", :aggregate_failures do
+      name, params, opts = ["foo:bar", {"bar" => "baz"}, {queue: "critical", retry: 5}]
+      configurator = double("configurator")
+      expect(Sidekiq::Tasks::Job).to receive(:set).with(opts).and_return(configurator)
+      expect(configurator).to receive(:perform_async).with(name, params.to_json).and_return("a1b2c3")
+
+      expect(described_class.new.enqueue_task(name, params, sidekiq_options: opts)).to eq("a1b2c3")
+    end
+
+    it "uses Job.perform_async directly when sidekiq_options is empty" do
+      expect(Sidekiq::Tasks::Job).not_to receive(:set)
+      expect(Sidekiq::Tasks::Job).to receive(:perform_async).with("foo", "{}")
+
+      described_class.new.enqueue_task("foo", {}, sidekiq_options: {})
+    end
   end
 
   describe "#build_task_metadata" do

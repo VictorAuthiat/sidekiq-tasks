@@ -90,7 +90,9 @@ RSpec.describe "Task page", type: :feature do
   it "can be enqueued with arguments" do
     clear_redis
     strategy = Sidekiq::Tasks.tasks.find_by!(name: "tests:task_with_args").strategy
-    expect(strategy).to receive(:enqueue_task).with("tests:task_with_args", {"name" => "Foo"}).and_call_original
+    expect(strategy).to(
+      receive(:enqueue_task).with("tests:task_with_args", {"name" => "Foo"}, sidekiq_options: {}).and_call_original
+    )
 
     visit "/tasks/tests-task_with_args"
     fill_in "env_confirmation", with: "development"
@@ -109,7 +111,9 @@ RSpec.describe "Task page", type: :feature do
   it "can be enqueued without arguments" do
     clear_redis
     strategy = Sidekiq::Tasks.tasks.find_by!(name: "tests:task_without_args").strategy
-    expect(strategy).to receive(:enqueue_task).with("tests:task_without_args", {}).and_call_original
+    expect(strategy).to(
+      receive(:enqueue_task).with("tests:task_without_args", {}, sidekiq_options: {}).and_call_original
+    )
 
     visit "/tasks/tests-task_without_args"
     fill_in "env_confirmation", with: "development"
@@ -255,6 +259,44 @@ RSpec.describe "Task page", type: :feature do
     visit "/tasks/tests-task_with_args"
 
     expect(page).not_to have_content("Enqueued by")
+  end
+
+  it "renders an Options row with the task overrides inline", :aggregate_failures do
+    custom_task = build_task(
+      name: "billing:retry",
+      desc: "Retry failed",
+      sidekiq_options: {queue: "critical", retry: 5}
+    )
+
+    allow(Sidekiq::Tasks).to receive(:tasks).and_return(build_task_set(custom_task))
+
+    visit "/tasks/billing-retry"
+
+    expect(page).to have_css("tr", text: /Options.*queue: critical, retry: 5/m)
+  end
+
+  it "does not render the Options row when no override is set" do
+    no_option_task = build_task(name: "tests:no_options", desc: "No options")
+
+    allow(Sidekiq::Tasks).to receive(:tasks).and_return(build_task_set(no_option_task))
+
+    visit "/tasks/tests-no_options"
+
+    expect(page).not_to have_css("tr", text: /Options/)
+  end
+
+  it "renders a broken task with an alert and hides the form", :aggregate_failures do
+    broken_task = build_task(name: "billing:broken", error: "'sidekiq_options' magic comment is not valid YAML")
+    allow(Sidekiq::Tasks).to receive(:tasks).and_return(build_task_set(broken_task))
+
+    visit "/tasks/billing-broken"
+
+    expect(page).to have_css(".st-alert.failure")
+    expect(page).to have_content("This task cannot be executed")
+    expect(page).to have_content("not valid YAML")
+    expect(page).not_to have_content("Run task")
+    expect(page).not_to have_css("tr", text: /Options/)
+    expect(page).not_to have_button("Enqueue")
   end
 
   it "displays error message in a tooltip when the task failed" do

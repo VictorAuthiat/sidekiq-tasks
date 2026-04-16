@@ -90,7 +90,9 @@ RSpec.describe "Task page", type: :feature do
   it "can be enqueued with arguments" do
     clear_redis
     strategy = Sidekiq::Tasks.tasks.find_by!(name: "tests:task_with_args").strategy
-    expect(strategy).to receive(:enqueue_task).with("tests:task_with_args", {"name" => "Foo"}).and_call_original
+    expect(strategy).to(
+      receive(:enqueue_task).with("tests:task_with_args", {"name" => "Foo"}, sidekiq_options: {}).and_call_original
+    )
 
     visit "/tasks/tests-task_with_args"
     fill_in "env_confirmation", with: "development"
@@ -109,7 +111,9 @@ RSpec.describe "Task page", type: :feature do
   it "can be enqueued without arguments" do
     clear_redis
     strategy = Sidekiq::Tasks.tasks.find_by!(name: "tests:task_without_args").strategy
-    expect(strategy).to receive(:enqueue_task).with("tests:task_without_args", {}).and_call_original
+    expect(strategy).to(
+      receive(:enqueue_task).with("tests:task_without_args", {}, sidekiq_options: {}).and_call_original
+    )
 
     visit "/tasks/tests-task_without_args"
     fill_in "env_confirmation", with: "development"
@@ -255,6 +259,34 @@ RSpec.describe "Task page", type: :feature do
     visit "/tasks/tests-task_with_args"
 
     expect(page).not_to have_content("Enqueued by")
+  end
+
+  it "renders the sidekiq_options section with override and default sources", :aggregate_failures do
+    custom_task = build_task(
+      name: "billing:retry",
+      desc: "Retry failed",
+      sidekiq_options: {queue: "critical"}
+    )
+
+    allow(Sidekiq::Tasks).to receive(:tasks).and_return(build_task_set(custom_task))
+    allow(Sidekiq::Tasks.config).to receive(:sidekiq_options).and_return({queue: "default", retry: false})
+
+    visit "/tasks/billing-retry"
+
+    expect(page).to have_content("Sidekiq options")
+    expect(page).to have_css("tr", text: /queue.*critical.*Override/m)
+    expect(page).to have_css("tr", text: /retry.*false.*Default/m)
+  end
+
+  it "does not render the sidekiq_options section when no option is set" do
+    no_option_task = build_task(name: "tests:no_options", desc: "No options")
+
+    allow(Sidekiq::Tasks).to receive(:tasks).and_return(build_task_set(no_option_task))
+    allow(Sidekiq::Tasks.config).to receive(:sidekiq_options).and_return({})
+
+    visit "/tasks/tests-no_options"
+
+    expect(page).not_to have_content("Sidekiq options")
   end
 
   it "displays error message in a tooltip when the task failed" do

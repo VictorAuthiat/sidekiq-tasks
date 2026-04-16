@@ -141,6 +141,20 @@ RSpec.describe "Tasks page", type: :feature do
     end
   end
 
+  it "displays a badge next to tasks that define custom sidekiq_options" do
+    custom_task = build_task(name: "billing:retry", desc: "Retry failed", sidekiq_options: {queue: "critical"})
+    allow(Sidekiq::Tasks).to receive(:tasks).and_return(build_task_set(custom_task, *tasks))
+
+    visit "/tasks"
+
+    aggregate_failures do
+      expect(page).to have_css("tr", text: "billing:retry") do |row|
+        expect(row).to have_css(".st-status-badge.override")
+      end
+      expect(page).not_to have_css("tr", text: "users:create .st-status-badge.override")
+    end
+  end
+
   it "filters the tasks list when a filter is provided, and shows all tasks when cleared" do
     visit "/tasks"
     fill_in "filter", with: "users"

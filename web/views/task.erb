@@ -35,6 +35,40 @@
   </tbody>
 </table>
 
+<% sidekiq_options_rows = task_sidekiq_options_rows(task) %>
+<% unless sidekiq_options_rows.empty? %>
+  <header class="">
+    <div class="">
+      <h2><%= t("sidekiq_options") %></h2>
+    </div>
+  </header>
+
+  <table class="st-table">
+    <thead>
+      <tr>
+        <th><%= t("option") %></th>
+        <th><%= t("value") %></th>
+        <th><%= t("source") %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% sidekiq_options_rows.each do |row| %>
+        <tr>
+          <th><code><%= row[:key] %></code></th>
+          <td><code><%= format_sidekiq_option_value(row[:value]) %></code></td>
+          <td>
+            <%= build_tag(
+              :span,
+              t(row[:source]).capitalize,
+              class: "st-status-badge #{row[:source]}"
+            ) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
 <header class="">
   <div class="">
     <h2><%= t("history") %></h2>

@@ -75,7 +75,7 @@ RSpec.describe Sidekiq::Tasks::Task do
 
       expect(task.strategy).to(
         receive(:enqueue_task)
-          .with("foo:bar", {"foo" => "bar"})
+          .with("foo:bar", {"foo" => "bar"}, sidekiq_options: {})
           .and_return("a1b2c3")
       )
 
@@ -104,7 +104,7 @@ RSpec.describe Sidekiq::Tasks::Task do
 
       expect(task.strategy).to(
         receive(:enqueue_task)
-          .with("foo:bar", {"foo" => "bar"})
+          .with("foo:bar", {"foo" => "bar"}, sidekiq_options: {})
           .and_return("a1b2c3")
       )
 
@@ -121,13 +121,25 @@ RSpec.describe Sidekiq::Tasks::Task do
 
       expect(task.strategy).to(
         receive(:enqueue_task)
-          .with("foo:bar", {"foo" => "bar"})
+          .with("foo:bar", {"foo" => "bar"}, sidekiq_options: {})
           .and_return("a1b2c3")
       )
 
       expect(task.storage).to(
         receive(:store_enqueue)
           .with("a1b2c3", {"foo" => "bar"}, user: nil)
+      )
+
+      task.enqueue({"foo" => "bar"})
+    end
+
+    it "forwards per-task sidekiq_options to the strategy" do
+      task = build_task(name: "foo:bar", args: ["foo"], sidekiq_options: {queue: "critical", retry: 5})
+
+      expect(task.strategy).to(
+        receive(:enqueue_task)
+          .with("foo:bar", {"foo" => "bar"}, sidekiq_options: {queue: "critical", retry: 5})
+          .and_return("a1b2c3")
       )
 
       task.enqueue({"foo" => "bar"})

@@ -35,15 +35,12 @@ RSpec.describe Sidekiq::Tasks::MagicComments::Handlers::SidekiqOptions do
       )
     end
 
-    it "raises when value type is invalid for a known key" do
-      expect { described_class.cast("queue: 123") }.to raise_error(
-        Sidekiq::Tasks::ArgumentError,
-        /'queue' must be an instance of String/
-      )
-    end
-
     it "accepts a partial hash (no queue required)" do
       expect(described_class.cast("retry: 3")).to eq(retry: 3)
+    end
+
+    it "accepts unknown keys without raising" do
+      expect(described_class.cast("whatever: yolo")).to eq(whatever: "yolo")
     end
   end
 end

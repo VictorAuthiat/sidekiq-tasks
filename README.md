@@ -209,7 +209,7 @@ task :generate_sales_report do
 end
 ```
 
-The value is parsed as inline YAML and merged on top of the global `config.sidekiq_options` at enqueue time. Supported keys: `queue`, `retry`, `retry_for`, `dead`, `backtrace`, `pool`, `tags`. The merged options are displayed on the task detail page (with each key flagged as `Override` or `Default`), and tasks that define custom options show a badge in the tasks list.
+The value is parsed as inline YAML and merged on top of the global `config.sidekiq_options` at enqueue time. Supported keys: `queue`, `retry`, `retry_for`, `dead`, `backtrace`, `pool`, `tags`.
 
 You can also override the `enqueue_task` method to implement your own enqueuing logic for your strategy:
 

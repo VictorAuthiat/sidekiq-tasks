@@ -49,26 +49,13 @@ module Sidekiq
             end
           end
 
-          def task_sidekiq_options_rows(task)
-            task_options = task.sidekiq_options
-            global_options = Sidekiq::Tasks.config.sidekiq_options
-
-            Sidekiq::Tasks::SidekiqOptionsValidator::KEYS.keys.filter_map do |key|
-              if task_options.key?(key)
-                {key: key, value: task_options[key], source: :override}
-              elsif global_options.key?(key)
-                {key: key, value: global_options[key], source: :default}
-              end
-            end
-          end
-
-          def task_has_custom_sidekiq_options?(task)
-            !task.sidekiq_options.empty?
+          def format_task_sidekiq_options(task)
+            task.sidekiq_options.map { |key, value| "#{key}: #{format_sidekiq_option_value(value)}" }.join(", ")
           end
 
           def format_sidekiq_option_value(value)
             case value
-            when Array then value.join(", ")
+            when Array then "[#{value.join(", ")}]"
             when nil then "-"
             else value.to_s
             end

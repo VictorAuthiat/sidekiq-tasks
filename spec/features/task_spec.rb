@@ -261,32 +261,42 @@ RSpec.describe "Task page", type: :feature do
     expect(page).not_to have_content("Enqueued by")
   end
 
-  it "renders the sidekiq_options section with override and default sources", :aggregate_failures do
+  it "renders an Options row with the task overrides inline", :aggregate_failures do
     custom_task = build_task(
       name: "billing:retry",
       desc: "Retry failed",
-      sidekiq_options: {queue: "critical"}
+      sidekiq_options: {queue: "critical", retry: 5}
     )
 
     allow(Sidekiq::Tasks).to receive(:tasks).and_return(build_task_set(custom_task))
-    allow(Sidekiq::Tasks.config).to receive(:sidekiq_options).and_return({queue: "default", retry: false})
 
     visit "/tasks/billing-retry"
 
-    expect(page).to have_content("Sidekiq options")
-    expect(page).to have_css("tr", text: /queue.*critical.*Override/m)
-    expect(page).to have_css("tr", text: /retry.*false.*Default/m)
+    expect(page).to have_css("tr", text: /Options.*queue: critical, retry: 5/m)
   end
 
-  it "does not render the sidekiq_options section when no option is set" do
+  it "does not render the Options row when no override is set" do
     no_option_task = build_task(name: "tests:no_options", desc: "No options")
 
     allow(Sidekiq::Tasks).to receive(:tasks).and_return(build_task_set(no_option_task))
-    allow(Sidekiq::Tasks.config).to receive(:sidekiq_options).and_return({})
 
     visit "/tasks/tests-no_options"
 
-    expect(page).not_to have_content("Sidekiq options")
+    expect(page).not_to have_css("tr", text: /Options/)
+  end
+
+  it "renders a broken task with an alert and hides the form", :aggregate_failures do
+    broken_task = build_task(name: "billing:broken", error: "'sidekiq_options' magic comment is not valid YAML")
+    allow(Sidekiq::Tasks).to receive(:tasks).and_return(build_task_set(broken_task))
+
+    visit "/tasks/billing-broken"
+
+    expect(page).to have_css(".st-alert.failure")
+    expect(page).to have_content("This task cannot be executed")
+    expect(page).to have_content("not valid YAML")
+    expect(page).not_to have_content("Run task")
+    expect(page).not_to have_css("tr", text: /Options/)
+    expect(page).not_to have_button("Enqueue")
   end
 
   it "displays error message in a tooltip when the task failed" do

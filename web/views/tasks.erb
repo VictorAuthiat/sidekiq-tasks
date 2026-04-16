@@ -71,6 +71,14 @@
               <a href="<%= task_url(root_path, task) %>" class="st-text-primary">
                 <b><%= task.name %></b>
               </a>
+              <% if task_has_custom_sidekiq_options?(task) %>
+                <%= build_tag(
+                  :span,
+                  t("sidekiq_options"),
+                  class: "st-status-badge override",
+                  "data-tooltip": t("custom_sidekiq_options_tooltip")
+                ) %>
+              <% end %>
             </td>
 
             <td><%= task.desc %></td>

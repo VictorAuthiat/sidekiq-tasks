@@ -25,15 +25,28 @@ RSpec.describe Sidekiq::Tasks::TaskMetadata do
       expect(build_task_metadata(args: [:foo]).args).to eq([:foo])
       expect { build_task_metadata(args: [1]) }.to raise_error(Sidekiq::Tasks::ArgumentError)
     end
+
+    it "accepts a partial sidekiq_options hash", :aggregate_failures do
+      expect(build_task_metadata(sidekiq_options: {}).sidekiq_options).to eq({})
+      expect(build_task_metadata(sidekiq_options: {queue: "low"}).sidekiq_options).to eq({queue: "low"})
+      expect { build_task_metadata(sidekiq_options: {queue: 1}) }.to raise_error(Sidekiq::Tasks::ArgumentError)
+    end
   end
 
   describe "readers" do
-    it "has name, desc, file and args", :aggregate_failures do
-      metadata = build_task_metadata(name: "foo", file: "foo.rb", desc: "foo", args: ["bar"])
+    it "has name, desc, file, args and sidekiq_options", :aggregate_failures do
+      metadata = build_task_metadata(
+        name: "foo", file: "foo.rb", desc: "foo", args: ["bar"], sidekiq_options: {retry: 5}
+      )
       expect(metadata.name).to eq("foo")
       expect(metadata.desc).to eq("foo")
       expect(metadata.file).to eq("foo.rb")
       expect(metadata.args).to eq(["bar"])
+      expect(metadata.sidekiq_options).to eq({retry: 5})
+    end
+
+    it "defaults sidekiq_options to an empty hash" do
+      expect(build_task_metadata.sidekiq_options).to eq({})
     end
   end
 end

@@ -78,58 +78,27 @@ RSpec.describe Sidekiq::Tasks::Web::Helpers::TaskHelper do
     end
   end
 
-  describe "#task_sidekiq_options_rows" do
-    it "returns an override row for each key set on the task", :aggregate_failures do
+  describe "#format_task_sidekiq_options" do
+    it "formats the task overrides as a oneline string", :aggregate_failures do
       task = build_task(sidekiq_options: {queue: "critical", retry: 5})
-      allow(Sidekiq::Tasks.config).to receive(:sidekiq_options).and_return({})
 
-      rows = described_class.task_sidekiq_options_rows(task)
-
-      expect(rows).to eq(
-        [
-          {key: :queue, value: "critical", source: :override},
-          {key: :retry, value: 5, source: :override},
-        ]
-      )
+      expect(described_class.format_task_sidekiq_options(task)).to eq("queue: critical, retry: 5")
     end
 
-    it "falls back to the global config when the task does not override the option", :aggregate_failures do
-      task = build_task(sidekiq_options: {queue: "critical"})
-      allow(Sidekiq::Tasks.config).to receive(:sidekiq_options).and_return({queue: "default", retry: false})
-
-      rows = described_class.task_sidekiq_options_rows(task)
-
-      expect(rows).to eq(
-        [
-          {key: :queue, value: "critical", source: :override},
-          {key: :retry, value: false, source: :default},
-        ]
-      )
+    it "returns an empty string when the task has no override" do
+      expect(described_class.format_task_sidekiq_options(build_task(sidekiq_options: {}))).to eq("")
     end
 
-    it "skips keys that are absent from both the task and the global config" do
-      task = build_task(sidekiq_options: {})
-      allow(Sidekiq::Tasks.config).to receive(:sidekiq_options).and_return({})
+    it "wraps array values in brackets" do
+      task = build_task(sidekiq_options: {tags: ["daily", "critical"]})
 
-      expect(described_class.task_sidekiq_options_rows(task)).to eq([])
-    end
-  end
-
-  describe "#task_has_custom_sidekiq_options?" do
-    it "returns true when the task defines sidekiq_options" do
-      task = build_task(sidekiq_options: {queue: "critical"})
-      expect(described_class.task_has_custom_sidekiq_options?(task)).to be(true)
-    end
-
-    it "returns false when the task does not define sidekiq_options" do
-      task = build_task(sidekiq_options: {})
-      expect(described_class.task_has_custom_sidekiq_options?(task)).to be(false)
+      expect(described_class.format_task_sidekiq_options(task)).to eq("tags: [daily, critical]")
     end
   end
 
   describe "#format_sidekiq_option_value" do
-    it "joins arrays with commas" do
-      expect(described_class.format_sidekiq_option_value(["a", "b"])).to eq("a, b")
+    it "wraps arrays in brackets" do
+      expect(described_class.format_sidekiq_option_value(["a", "b"])).to eq("[a, b]")
     end
 
     it "returns '-' for nil" do

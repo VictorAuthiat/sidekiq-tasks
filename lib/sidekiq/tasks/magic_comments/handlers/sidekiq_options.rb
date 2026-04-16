@@ -12,16 +12,7 @@ module Sidekiq
           def self.cast(raw_value)
             return {} if raw_value.nil? || raw_value.strip.empty?
 
-            parsed = parse_yaml(raw_value)
-
-            unless parsed.is_a?(Hash)
-              raise Sidekiq::Tasks::ArgumentError,
-                    "'sidekiq_options' magic comment must parse to a Hash but received #{parsed.class}"
-            end
-
-            Sidekiq::Tasks::SidekiqOptionsValidator.validate!(parsed, allow_partial: true)
-
-            parsed
+            parse_yaml(raw_value)
           end
 
           def self.parse_yaml(raw_value)

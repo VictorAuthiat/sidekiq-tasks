@@ -144,6 +144,16 @@ RSpec.describe Sidekiq::Tasks::Task do
 
       task.enqueue({"foo" => "bar"})
     end
+
+    it "raises when the task is broken", :aggregate_failures do
+      task = build_task(name: "foo:bar", error: "boom")
+
+      expect(task.strategy).not_to receive(:enqueue_task)
+      expect { task.enqueue }.to raise_error(
+        Sidekiq::Tasks::ArgumentError,
+        "cannot enqueue broken task 'foo:bar': boom"
+      )
+    end
   end
 
   describe "#execute" do

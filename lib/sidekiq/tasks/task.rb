@@ -6,7 +6,7 @@ module Sidekiq
       extend Forwardable
       include Sidekiq::Tasks::Validations
 
-      def_delegators :metadata, :name, :desc, :file, :args, :sidekiq_options
+      def_delegators :metadata, :name, :desc, :file, :args, :sidekiq_options, :error, :error?
       def_delegators :storage, :last_enqueue_at, :history
 
       attr_reader :metadata, :strategy
@@ -23,6 +23,8 @@ module Sidekiq
       end
 
       def enqueue(params = {}, user: nil)
+        raise Sidekiq::Tasks::ArgumentError, "cannot enqueue broken task '#{name}': #{error}" if error?
+
         jid = strategy.enqueue_task(name, params, sidekiq_options: sidekiq_options)
 
         storage.store_enqueue(jid, params, user: user)

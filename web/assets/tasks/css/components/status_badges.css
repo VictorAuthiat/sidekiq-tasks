@@ -14,14 +14,6 @@
   --badge-pending-text: #8a6d1d;
   --badge-pending-bg: #fff8dc;
   --badge-pending-border: #f5e6ab;
-
-  --badge-override-text: #5b3b8a;
-  --badge-override-bg: #ece1ff;
-  --badge-override-border: #c9b1ee;
-
-  --badge-default-text: #555;
-  --badge-default-bg: #f0f0f0;
-  --badge-default-border: #ccc;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -41,14 +33,6 @@
     --badge-pending-text: #f5e6ab;
     --badge-pending-bg: #3e351a;
     --badge-pending-border: #7a6a2e;
-
-    --badge-override-text: #c9b1ee;
-    --badge-override-bg: #2c1f4a;
-    --badge-override-border: #5b3b8a;
-
-    --badge-default-text: #ccc;
-    --badge-default-bg: #2a2a2a;
-    --badge-default-border: #444;
   }
 }
 
@@ -85,16 +69,4 @@
   color: var(--badge-pending-text);
   background-color: var(--badge-pending-bg);
   border-color: var(--badge-pending-border);
-}
-
-.st-status-badge.override {
-  color: var(--badge-override-text);
-  background-color: var(--badge-override-bg);
-  border-color: var(--badge-override-border);
-}
-
-.st-status-badge.default {
-  color: var(--badge-default-text);
-  background-color: var(--badge-default-bg);
-  border-color: var(--badge-default-border);
 }

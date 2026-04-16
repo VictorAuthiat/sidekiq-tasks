@@ -21,6 +21,12 @@ module Sidekiq
             args: task.arg_names,
             sidekiq_options: extract_sidekiq_options(task)
           )
+        rescue Sidekiq::Tasks::ArgumentError => e
+          Sidekiq::Tasks::TaskMetadata.new(
+            name: task.name,
+            file: task.locations.first&.split(":")&.first,
+            error: e.message
+          )
         end
 
         def execute_task(name, args = nil)

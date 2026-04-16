@@ -14,6 +14,17 @@
   <h1><%= t("task") %></h1>
 </header>
 
+<% if task.error? %>
+  <div class="st-alert failure">
+    <div class="st-alert-title"><%= t("task_broken_title") %></div>
+    <div class="st-alert-body">
+      <%= t("task_broken_message") %>
+      <br>
+      <code><%= task.error %></code>
+    </div>
+  </div>
+<% end %>
+
 <table class="st-table">
   <tbody>
     <tr>
@@ -28,46 +39,18 @@
       <th><%= t("strategy") %></th>
       <td><%= task.strategy.name %></td>
     </tr>
+    <% unless task.error? || task.sidekiq_options.empty? %>
+      <tr>
+        <th><%= t("options") %></th>
+        <td><code><%= format_task_sidekiq_options(task) %></code></td>
+      </tr>
+    <% end %>
     <tr>
       <th><%= t("last_enqueued") %></th>
       <td><%= task.last_enqueue_at ? relative_time(task.last_enqueue_at) : "-" %></td>
     </tr>
   </tbody>
 </table>
-
-<% sidekiq_options_rows = task_sidekiq_options_rows(task) %>
-<% unless sidekiq_options_rows.empty? %>
-  <header class="">
-    <div class="">
-      <h2><%= t("sidekiq_options") %></h2>
-    </div>
-  </header>
-
-  <table class="st-table">
-    <thead>
-      <tr>
-        <th><%= t("option") %></th>
-        <th><%= t("value") %></th>
-        <th><%= t("source") %></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% sidekiq_options_rows.each do |row| %>
-        <tr>
-          <th><code><%= row[:key] %></code></th>
-          <td><code><%= format_sidekiq_option_value(row[:value]) %></code></td>
-          <td>
-            <%= build_tag(
-              :span,
-              t(row[:source]).capitalize,
-              class: "st-status-badge #{row[:source]}"
-            ) %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-<% end %>
 
 <header class="">
   <div class="">
@@ -140,6 +123,7 @@
   <% end %>
 </div>
 
+<% unless task.error? %>
 <header class="">
   <div class="">
     <h2><%= t("run_task") %></h2>
@@ -177,6 +161,7 @@
     <%= t("enqueue") %>
   </button>
 </form>
+<% end %>
 
 <% if Sidekiq::Tasks::Web::SIDEKIQ_GTE_7_3_0 %>
   <%= script_tag "tasks/js/env_confirmation.js" %>

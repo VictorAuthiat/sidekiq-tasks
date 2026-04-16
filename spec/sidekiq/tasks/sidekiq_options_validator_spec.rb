@@ -28,6 +28,10 @@ RSpec.describe Sidekiq::Tasks::SidekiqOptionsValidator do
           /'retry' must be an instance of/
         )
       end
+
+      it "accepts unknown keys" do
+        expect { described_class.validate!({queue: "low", foo: "bar"}) }.not_to raise_error
+      end
     end
 
     context "with allow_partial: true" do
@@ -44,6 +48,10 @@ RSpec.describe Sidekiq::Tasks::SidekiqOptionsValidator do
           Sidekiq::Tasks::ArgumentError,
           /'queue' must be an instance of String/
         )
+      end
+
+      it "accepts unknown keys" do
+        expect { described_class.validate!({foo: "bar"}, allow_partial: true) }.not_to raise_error
       end
     end
   end

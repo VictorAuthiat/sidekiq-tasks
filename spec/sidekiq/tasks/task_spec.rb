@@ -75,7 +75,7 @@ RSpec.describe Sidekiq::Tasks::Task do
 
       expect(task.strategy).to(
         receive(:enqueue_task)
-          .with("foo:bar", {"foo" => "bar"})
+          .with("foo:bar", {"foo" => "bar"}, sidekiq_options: {})
           .and_return("a1b2c3")
       )
 
@@ -104,7 +104,7 @@ RSpec.describe Sidekiq::Tasks::Task do
 
       expect(task.strategy).to(
         receive(:enqueue_task)
-          .with("foo:bar", {"foo" => "bar"})
+          .with("foo:bar", {"foo" => "bar"}, sidekiq_options: {})
           .and_return("a1b2c3")
       )
 
@@ -121,7 +121,7 @@ RSpec.describe Sidekiq::Tasks::Task do
 
       expect(task.strategy).to(
         receive(:enqueue_task)
-          .with("foo:bar", {"foo" => "bar"})
+          .with("foo:bar", {"foo" => "bar"}, sidekiq_options: {})
           .and_return("a1b2c3")
       )
 
@@ -131,6 +131,28 @@ RSpec.describe Sidekiq::Tasks::Task do
       )
 
       task.enqueue({"foo" => "bar"})
+    end
+
+    it "forwards per-task sidekiq_options to the strategy" do
+      task = build_task(name: "foo:bar", args: ["foo"], sidekiq_options: {queue: "critical", retry: 5})
+
+      expect(task.strategy).to(
+        receive(:enqueue_task)
+          .with("foo:bar", {"foo" => "bar"}, sidekiq_options: {queue: "critical", retry: 5})
+          .and_return("a1b2c3")
+      )
+
+      task.enqueue({"foo" => "bar"})
+    end
+
+    it "raises when the task is broken", :aggregate_failures do
+      task = build_task(name: "foo:bar", error: "boom")
+
+      expect(task.strategy).not_to receive(:enqueue_task)
+      expect { task.enqueue }.to raise_error(
+        Sidekiq::Tasks::ArgumentError,
+        "cannot enqueue broken task 'foo:bar': boom"
+      )
     end
   end
 

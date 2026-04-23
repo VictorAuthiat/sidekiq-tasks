@@ -48,6 +48,18 @@ module Sidekiq
               "#{[duration_in_milliseconds, 1].max}ms"
             end
           end
+
+          def format_task_sidekiq_options(task)
+            task.sidekiq_options.map { |key, value| "#{key}: #{format_sidekiq_option_value(value)}" }.join(", ")
+          end
+
+          def format_sidekiq_option_value(value)
+            case value
+            when Array then "[#{value.join(", ")}]"
+            when nil then "-"
+            else value.to_s
+            end
+          end
         end
       end
     end

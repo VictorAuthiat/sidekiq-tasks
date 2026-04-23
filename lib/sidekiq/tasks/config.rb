@@ -34,14 +34,7 @@ module Sidekiq
 
       # @see https://github.com/sidekiq/sidekiq/wiki/Advanced-Options#jobs
       def sidekiq_options=(options)
-        validate_class!(options, [Hash], "sidekiq_options")
-        validate_hash_option!(options, :queue, [String])
-        validate_hash_option!(options, :retry, [NilClass, TrueClass, FalseClass, Integer])
-        validate_hash_option!(options, :retry_for, [NilClass, Integer, Float])
-        validate_hash_option!(options, :dead, [NilClass, TrueClass, FalseClass])
-        validate_hash_option!(options, :backtrace, [NilClass, TrueClass, FalseClass, Integer])
-        validate_hash_option!(options, :pool, [NilClass, String])
-        validate_hash_option!(options, :tags, [NilClass, Array])
+        Sidekiq::Tasks::SidekiqOptionsValidator.validate!(options)
 
         @sidekiq_options = options
       end

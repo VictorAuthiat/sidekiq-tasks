@@ -197,11 +197,25 @@ end
 
 All standard [Sidekiq job options](https://github.com/sidekiq/sidekiq/wiki/Advanced-Options#jobs) are supported.
 
+### Per-task overrides via magic comment
+
+You can override `sidekiq_options` for a single Rake task with the `sidekiq-tasks:sidekiq_options` magic comment placed right before the task:
+
+```ruby
+# sidekiq-tasks:enable
+# sidekiq-tasks:sidekiq_options: queue: low
+task :generate_sales_report do
+  # ...
+end
+```
+
+The value is parsed as inline YAML and merged on top of the global `config.sidekiq_options` at enqueue time. Supported keys: `queue`, `retry`, `retry_for`, `dead`, `backtrace`, `pool`, `tags`.
+
 You can also override the `enqueue_task` method to implement your own enqueuing logic for your strategy:
 
 ```ruby
 class ScriptStrategy < Sidekiq::Tasks::Strategies::Base
-  def enqueue_task(name, params = {})
+  def enqueue_task(name, params = {}, sidekiq_options: {})
     ScriptJob.perform_async(name, params)
   end
 end

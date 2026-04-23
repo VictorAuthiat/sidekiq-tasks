@@ -1,5 +1,10 @@
 ## Changelog
 
+### [Unreleased]
+
+- Add per-task `sidekiq_options` magic comment to override the global options at enqueue time, displayed on the task detail page.
+- Render tasks with an invalid magic comment as a broken state in the web UI instead of crashing the tasks list.
+
 ### [1.1.1] - 2026-04-12
 
 - Transfer repository ownership to Capsens organization.

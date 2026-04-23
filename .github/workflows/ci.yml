@@ -48,14 +48,16 @@ jobs:
 
     services:
       redis:
-        image: "redis"
+        image: "redis@sha256:f4e03de519aa22dc6c0a42e4afb10ef8ff15d818e9d388b0782060e2a4dd583d"
         ports: ["6379:6379"]
 
     steps:
-      - uses: "actions/checkout@v4"
+      - uses: "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: "Set up Ruby"
-        uses: "ruby/setup-ruby@v1"
+        uses: "ruby/setup-ruby@4c56a21280b36d862b5fc31348f463d60bdc55d5" # v1.301.0
         with:
           ruby-version: ${{ matrix.ruby }}
 
@@ -70,7 +72,7 @@ jobs:
 
       - name: "Upload coverage to Qlty"
         if: matrix.ruby == '3.4' && matrix.sidekiq == '= 7' && matrix.rack == '>= 3.1.0'
-        uses: qltysh/qlty-action/coverage@v1
+        uses: qltysh/qlty-action/coverage@a19242102d17e497f437d7466aa01b528537e899 # v2.2.0
         with:
           oidc: true
           files: coverage/.resultset.json
